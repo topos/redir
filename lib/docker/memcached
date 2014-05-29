@@ -1,0 +1,12 @@
+# Memcached
+# VERSION 0.1
+FROM ubuntu
+MAINTAINER Victor Coisne victor.coisne@dotcloud.com
+
+RUN echo "deb http://archive.ubuntu.com/ubuntu trusty main universe" > /etc/apt/sources.list
+RUN apt-get update -y
+RUN apt-get install -y memcached
+
+ENTRYPOINT ["memcached"]
+USER daemon
+EXPOSE 11211

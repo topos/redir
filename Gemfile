@@ -1,0 +1,5 @@
+source 'http://rubygems.org'
+gem 'smart_colored', '~> 1.1'
+gem 'sys-proctable', '~> 0.9'
+gem 'listen', '~> 2.3'
+gem 'rake', '~> 10.1.1'
