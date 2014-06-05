@@ -162,7 +162,7 @@ namespace :lxc do
     end
   end
 
-  desc "destroy lx container"
+  desc "destroy lx container".green
   task :destroy, [:name,:force] do |t,arg|
     raise "error: lxc \"name\" is required" if arg.name.nil?
     unless arg.force.nil?
@@ -204,20 +204,20 @@ namespace :lxc do
   desc "initialize/install lxc".green
   task :init => [:install_lxc,:network_config]
 
-  desc "configure outbound IP traffic from a container"
-  task :network_config do
-    # ! may not be needed anymore
-    # dotdir = File.expand_path(File.dirname(__FILE__))
-    # if File.exists?("/etc/lxc/default.conf") && !File.exists?("/etc/lxc/default.conf.orig")
-    #   Dir.chdir("/etc/lxc") do
-    #     sh "sudo mv -f default.conf default.conf.orig"
-    #   end
-    # end
-    # sh "sudo cp #{dotdir}/lxc_default.conf /etc/lxc/default.conf"
-  end
+  # desc "configure outbound IP traffic from a container"
+  # task :network_config do
+  #   # ! may not be needed anymore
+  #   dotdir = File.expand_path(File.dirname(__FILE__))
+  #   if File.exists?("/etc/lxc/default.conf") && !File.exists?("/etc/lxc/default.conf.orig")
+  #     Dir.chdir("/etc/lxc") do
+  #       sh "sudo mv -f default.conf default.conf.orig"
+  #     end
+  #   end
+  #   sh "sudo cp #{dotdir}/lxc_default.conf /etc/lxc/default.conf"
+  # end
 
   # @todo: automate
-  desc "configure bridge network on primary host".red
+  desc "configure bridge network on primary host"
   task :bridge_network do
     puts "- append the following to /etc/network/interfaces:"
     puts "auto lxcbr0"
@@ -227,12 +227,6 @@ namespace :lxc do
     puts "    bridge_fd 0"
     puts "    bridge_maxwait 0"
     puts "- and comment out \"eth0\" fragment"
-  end
-
-  def lxc2ip(name)
-    ip = `sudo lxc-ls --fancy|egrep '^#{name}\s+'|awk '{print $3}'`.strip
-    ip = ip.gsub(/,/,'') if ip =~ /[^,]+,$/
-    ip
   end
 
   desc "rsync PROJ_HOME to lxc"
@@ -252,5 +246,11 @@ namespace :lxc do
 
   def default_packages 
     'lxc rsync ruby2.0 ruby2.0-dev git-core curl zlib1g-dev build-essential libssl-dev libgmp-dev libreadline-dev libyaml-dev libsqlite3-dev sqlite3 libxml2-dev libxslt1-dev'
+  end
+
+  def lxc2ip(name)
+    ip = `sudo lxc-ls --fancy|egrep '^#{name}\s+'|awk '{print $3}'`.strip
+    ip = ip.gsub(/,/,'') if ip =~ /[^,]+,$/
+    ip
   end
 end

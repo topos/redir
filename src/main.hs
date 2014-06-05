@@ -6,7 +6,6 @@ import Network.Wai
 import Network.HTTP.Types (status200,status301)
 import Network.Wai.Handler.Warp (run)
 import Control.Exception (try)
-import Data.Either (isLeft,isRight)
 import Data.Maybe (fromMaybe)
 import Data.ByteString (ByteString)
 import Data.Text (Text)

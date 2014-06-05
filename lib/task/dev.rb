@@ -4,8 +4,14 @@ require 'date'
 require 'yaml'
 require 'smart_colored/extend'
 
-def platform?(p)
-  `uname -s`.strip.downcase == p.downcase
+def sys_name
+  s = `uname -s`.strip.downcase
+  s = `lsb_release --id`.split.last.strip.downcase if 'linux' == s
+  s
+end
+
+def sys_name?(p)
+  sys_name == p.strip.downcase
 end
 
 def proj_dir(subdir =nil)
@@ -27,14 +33,19 @@ def process_running?(name, argfilter =nil)
   false
 end
 
-def proj_mode
-  ENV['PROJ_MODE'].nil? ? 'Development' : ENV['PROJ_MODE']
-end
-
-def terminal(cmd ='', opts ='', title ='')
-  raise "cmd is undefined" if cmd.nil?
-  title = "#{cmd} #{opts}" if title == ''
-  "gnome-terminal --title '#{title}' --execute sh -c '#{cmd} #{opts}'"
+def install_pkg(pkgs =[], sysname =sys_name)
+  update, install = case sysname
+                    when 'centos'
+                      ['sudo yum update -y', 'sudo yum install -y']
+                    when 'darwin'
+                      ['brew update -y', 'brew install']
+                    when 'ubuntu'
+                      ['sudo apt-get update -y', 'sudo apt-get install -y']
+                    else
+                      raise "unknown system--not in {centos,darwin,ubuntu}"
+                    end
+  sh "#{update}"
+  sh "#{install} #{pkgs.join(' ')}"
 end
 
 def src_files(spec_too =false)
@@ -79,7 +90,7 @@ _path = []
 _path << "#{PROJ_DIR}/bin"
 _path << "#{PROJ_DIR}/.cabal-sandbox/bin"
 _path << "#{PROJ_DIR}/.cabal/bin"
-_path << (platform?('darwin') ? '~/Library/Haskell/bin' : '/opt/hp/bin')
+_path << (sys_name?('darwin') ? '~/Library/Haskell/bin' : '/opt/ghc/bin')
 _path << '/usr/local/bin'
 _path << '/usr/bin'
 _path << '/bin'
