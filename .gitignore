@@ -1,0 +1,12 @@
+Main
+Spec
+*.hi
+*.dyn_hi
+*.o
+*.dyn_o
+opt
+.bundle
+.cabal*
+.ghc
+cabal.sandbox.config
+cloud-haskell
