@@ -8,6 +8,9 @@ namespace :mesos do
   desc "clean"
   task :clean => 'mesos:_install:clean'
 
+  desc "clean"
+  task :clobber => 'mesos:_install:clobber'
+
   namespace :_install do
     ENV['JAVA_HOME'] = '/usr/lib/jvm/default-java'
     MESOS_VER = '0.18.2'
@@ -24,7 +27,7 @@ namespace :mesos do
     #task :build => [MESOS_DIR]
 
     task :build => MESOS_DIR do
-      sh "cd #{MESOS_DIR} && make -j 4"
+      sh "cd #{MESOS_DIR}/build && make -j 4"
       sh 'rake mesos:check'
     end
 
@@ -34,7 +37,8 @@ namespace :mesos do
 
     directory MESOS_DIR => MESOS_TAR do |t| 
       sh "cd /var/tmp && tar xf #{MESOS_TAR}"
-      sh "cd #{MESOS_DIR} && ./configure --prefix=/opt/mesos CFLAGS=-O2"
+      sh "mkdir -p #{MESOS_DIR}/build"
+      sh "cd #{MESOS_DIR}/build && ../configure --prefix=/opt/mesos CFLAGS=-O2"
     end
 
     file MESOS_TAR do |t|
@@ -42,6 +46,12 @@ namespace :mesos do
     end
 
     task :clean do
+      Dir.chdir MESOS_DIR do
+        sh "make clean"
+      end
+    end
+
+    task :clobber do
       [MESOS_TAR,MESOS_DIR].each do |d|
         sh "rm -rf #{d}"
       end
