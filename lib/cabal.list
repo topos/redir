@@ -1,8 +1,8 @@
-# cabal package | [debian package]
-#
-# bug need to comment out after first run
+# cabal packages
+# bug: run once then comment out happy-* and alex-*
 # happy-1.19.3
 # alex-3.1.3
+# ---
 lens-4.1.2.1
 hspec-1.9.5
 wai-2.1.0.3

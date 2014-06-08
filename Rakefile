@@ -24,6 +24,8 @@ task :update => 'dev:update'
 task :clean => 'dev:clean'
 task :ghci => 'dev:ghci'
 
-task :run, [:options] => 'run:run'
+task :main, [:opts] => 'run:main'
+task :spec, [:opts] => 'run:spec'
+task :ab, [:clients,:requests,:url,:opts] => 'run:ab'
 
 task :default do; sh "rake -T", verbose: false; end
