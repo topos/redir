@@ -162,7 +162,7 @@ namespace :lxc do
     end
   end
 
-  desc "destroy lx container"
+  desc "destroy lx container".green
   task :destroy, [:name,:force] do |t,arg|
     raise "error: lxc \"name\" is required" if arg.name.nil?
     unless arg.force.nil?
@@ -217,7 +217,7 @@ namespace :lxc do
   end
 
   # @todo: automate
-  desc "configure bridge network on primary host".red
+  desc "configure bridge network on primary host"
   task :bridge_network do
     puts "- append the following to /etc/network/interfaces:"
     puts "auto lxcbr0"
@@ -252,5 +252,11 @@ namespace :lxc do
 
   def default_packages 
     'lxc rsync ruby2.0 ruby2.0-dev git-core curl zlib1g-dev build-essential libssl-dev libgmp-dev libreadline-dev libyaml-dev libsqlite3-dev sqlite3 libxml2-dev libxslt1-dev'
+  end
+
+  def lxc2ip(name)
+    ip = `sudo lxc-ls --fancy|egrep '^#{name}\s+'|awk '{print $3}'`.strip
+    ip = ip.gsub(/,/,'') if ip =~ /[^,]+,$/
+    ip
   end
 end

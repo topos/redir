@@ -18,7 +18,7 @@ namespace :cloud do
   end
 
   namespace :haskell do
-    raise "../cloud-haskell doesn't exist" unless Dir.exists? '../cloud-haskell'
+    # raise "../cloud-haskell doesn't exist".red unless Dir.exists? '../cloud-haskell'
     desc "install cloud haskell into this project's .cabal-sandbox:)"
     task :install do
       sh "ln -fs ../cloud-haskell ."

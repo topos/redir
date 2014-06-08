@@ -4,6 +4,16 @@ require 'date'
 require 'yaml'
 require 'smart_colored/extend'
 
+def sys_name
+  s = `uname -s`.strip.downcase
+  s = `lsb_release --id`.split.last.strip.downcase if 'linux' == s
+  s
+end
+
+def sys_name?(p)
+  sys_name == p.strip.downcase
+end
+
 def platform?(p)
   `uname -s`.strip.downcase == p.downcase
 end
@@ -31,10 +41,19 @@ def proj_mode
   ENV['PROJ_MODE'].nil? ? 'Development' : ENV['PROJ_MODE']
 end
 
-def terminal(cmd ='', opts ='', title ='')
-  raise "cmd is undefined" if cmd.nil?
-  title = "#{cmd} #{opts}" if title == ''
-  "gnome-terminal --title '#{title}' --execute sh -c '#{cmd} #{opts}'"
+def install_pkg(pkgs =[], sysname =sys_name)
+  update, install = case sysname
+                    when 'centos'
+                      ['sudo yum update -y', 'sudo yum install -y']
+                    when 'darwin'
+                      ['brew update -y', 'brew install']
+                    when 'ubuntu'
+                      ['sudo apt-get update -y', 'sudo apt-get install -y']
+                    else
+                      raise "unknown system--not in {centos,darwin,ubuntu}"
+                    end
+  sh "#{update}"
+  sh "#{install} #{pkgs.join(' ')}"
 end
 
 def src_files(spec_too =false)
@@ -65,12 +84,13 @@ OS = case os
      when 'linux'; 'linux'
      else raise "unknown OS: #{os}"
      end
-GHC_PACKAGE_PATH = "#{PROJ_DIR}/.cabal-sandbox/x86_64-#{OS}-ghc-7.8.2-packages.conf.d"
+GHC_VERSION = '7.8.2'
+GHC_PACKAGE_PATH = "#{PROJ_DIR}/.cabal-sandbox/x86_64-#{OS}-ghc-#{GHC_VERSION}-packages.conf.d"
 CABAL_SANDBOX_DIR = "#{PROJ_DIR}/.cabal-sandbox"
 EXTRA_INC_DIR = "/opt/zmq/include"
 EXTRA_LIB_DIR = "/opt/zmq/lib"
 EXTRA_INC, EXTRA_LIB = ['#{EXTRA_INC_DIR}',"-L#{EXTRA_LIB_DIR} -lzmq"]
-GHC_OPT = "-no-user-package-db -package-db #{PROJ_DIR}/.cabal-sandbox/*-packages.conf.d"
+GHC_OPT = "-no-user-package-db -package-db #{PROJ_DIR}/.cabal-sandbox/*-#{GHC_VERSION}-packages.conf.d"
 #GHC = "ghc #{GHC_PACKAGE_PATH.split.map{|p|"-package-db #{p}"}.join(' ')} -hide-package monads-tf -threaded"
 GHC = "ghc #{GHC_OPT} -threaded"
 
@@ -79,7 +99,7 @@ _path = []
 _path << "#{PROJ_DIR}/bin"
 _path << "#{PROJ_DIR}/.cabal-sandbox/bin"
 _path << "#{PROJ_DIR}/.cabal/bin"
-_path << (platform?('darwin') ? '~/Library/Haskell/bin' : '/opt/hp/bin')
+_path << (sys_name?('darwin') ? '~/Library/Haskell/bin' : '/opt/ghc/bin')
 _path << '/usr/local/bin'
 _path << '/usr/bin'
 _path << '/bin'
