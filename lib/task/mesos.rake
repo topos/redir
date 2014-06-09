@@ -12,7 +12,7 @@ namespace :mesos do
   task :clobber => 'mesos:_install:clobber'
 
   namespace :_install do
-    MESOS_VER = '0.18.2'
+    MESOS_VER = '0.19.0'
     MESOS_URL = "http://www.apache.org/dist/mesos/#{MESOS_VER}/mesos-#{MESOS_VER}.tar.gz"
     MESOS_TAR = "/var/tmp/#{MESOS_URL.split('/').last}"
     MESOS_DIR = MESOS_TAR.split('.').first(MESOS_TAR.split('.').size-2).join('.')
@@ -26,13 +26,15 @@ namespace :mesos do
     #task :build => [MESOS_DIR]
 
     task :build => MESOS_DIR do
-      sh "cd #{MESOS_DIR}/build && ../configure --prefix=/opt/mesos CFLAGS=-O2"
-      sh "cd #{MESOS_DIR}/build && make -j 4"
-      sh 'rake mesos:check'
+      Dir.chdir "#{MESOS_DIR}/build" do
+        sh "../configure --prefix=/opt/mesos CFLAGS=-O2 CXXFLAGS=-O2"
+        sh "make -j 4"
+        sh 'rake mesos:check'
+      end
     end
 
     task :check do
-      sh "cd #{MESOS_DIR} && make check"
+    ls  sh "cd #{MESOS_DIR} && make check"
     end
 
     directory MESOS_DIR => MESOS_TAR do |t| 
