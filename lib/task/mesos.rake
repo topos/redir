@@ -12,7 +12,6 @@ namespace :mesos do
   task :clobber => 'mesos:_install:clobber'
 
   namespace :_install do
-    ENV['JAVA_HOME'] = '/usr/lib/jvm/default-java'
     MESOS_VER = '0.18.2'
     MESOS_URL = "http://www.apache.org/dist/mesos/#{MESOS_VER}/mesos-#{MESOS_VER}.tar.gz"
     MESOS_TAR = "/var/tmp/#{MESOS_URL.split('/').last}"
@@ -27,6 +26,7 @@ namespace :mesos do
     #task :build => [MESOS_DIR]
 
     task :build => MESOS_DIR do
+      sh "cd #{MESOS_DIR}/build && ../configure --prefix=/opt/mesos CFLAGS=-O2"
       sh "cd #{MESOS_DIR}/build && make -j 4"
       sh 'rake mesos:check'
     end
@@ -38,7 +38,6 @@ namespace :mesos do
     directory MESOS_DIR => MESOS_TAR do |t| 
       sh "cd /var/tmp && tar xf #{MESOS_TAR}"
       sh "mkdir -p #{MESOS_DIR}/build"
-      sh "cd #{MESOS_DIR}/build && ../configure --prefix=/opt/mesos CFLAGS=-O2"
     end
 
     file MESOS_TAR do |t|
@@ -58,7 +57,7 @@ namespace :mesos do
     end
 
     packages = {}
-    packages['ubuntu'] = %w(autoconf libtool build-essential oracle-java8-installer python-dev python-boto libcurl4-nss-dev libsasl2-dev libprotobuf-dev libprotobuf-java)
+    packages['ubuntu'] = %w(autoconf libtool build-essential oracle-java8-installer python-dev python-boto libcurl4-nss-dev libsasl2-dev libprotobuf-dev libprotobuf-java maven)
     task :pkgs do
       install_pkg(packages[sys_name])
     end
