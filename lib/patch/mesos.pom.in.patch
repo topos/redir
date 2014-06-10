@@ -1,0 +1,20 @@
+--- mesos.pom.in	2014-06-06 02:31:35.000000000 -0400
++++ mesos-fixed.pom.in	2014-06-10 02:12:04.196000000 -0400
+@@ -86,6 +86,17 @@
+       <version>2.5.0</version>
+     </dependency>
+   </dependencies>
++  <profiles>
++    <profile>
++      <id>java8-disable-strict-javadoc</id>
++      <activation>
++        <jdk>[1.8,)</jdk>
++      </activation>
++      <properties>
++        <javadoc.doclint.none>-Xdoclint:none</javadoc.doclint.none>
++      </properties>
++    </profile>
++  </profiles>
+   <build>
+     <sourceDirectory>@abs_top_srcdir@/src/java/src</sourceDirectory>
+     <resources>
