@@ -5,10 +5,13 @@ namespace :mesos do
   desc "build"
   task :build => 'mesos:_install:build'
 
+  desc "check"
+  task :check => 'mesos:_install:check'
+
   desc "clean"
   task :clean => 'mesos:_install:clean'
 
-  desc "clean"
+  desc "clobber"
   task :clobber => 'mesos:_install:clobber'
 
   namespace :_install do
@@ -20,12 +23,22 @@ namespace :mesos do
     task :default => :install
 
     desc "install mesos from source"
-    task :install => [:pkgs, :build]
+    task :install => [:pkgs, :build] do |t,arg|
+      Dir.chdir "#{MESOS_DIR}/build" do
+        sh "sudo make install"
+      end
+    end
     
     # build from source
     #task :build => [MESOS_DIR]
 
     task :build => MESOS_DIR do
+      Dir.chdir "#{MESOS_DIR}/src/java" do
+        unless File.readlines('mesos.pom.in').grep(/<jdk>\[1.8,\)/).any?
+          sh "patch -p0 < #{LIB_DIR}/patch/mesos.pom.in.patch"
+        end
+      end
+      sh "mkdir -p #{MESOS_DIR}/build"
       Dir.chdir "#{MESOS_DIR}/build" do
         sh "../configure --prefix=/opt/mesos CFLAGS=-O2 CXXFLAGS=-O2"
         sh "make -j 4"
@@ -34,7 +47,7 @@ namespace :mesos do
     end
 
     task :check do
-    ls  sh "cd #{MESOS_DIR} && make check"
+      sh "cd #{MESOS_DIR}/build && make check"
     end
 
     directory MESOS_DIR => MESOS_TAR do |t| 

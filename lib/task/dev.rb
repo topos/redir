@@ -71,12 +71,11 @@ end
 
 PROJ_DIR = File.expand_path("#{File.dirname(__FILE__)}/../../.")
 SRC_DIR = proj_dir('src')
-ETC_DIR = proj_dir('etc')
 LIB_DIR = proj_dir('lib')
 TASK_DIR = proj_dir('lib/task')
-OPT_DIR = proj_dir('opt')
 SANDBOX_DIR = proj_dir('.cabal-sandbox')
 PROJ_HOME = PROJ_DIR
+OPT_DIR = '/opt'
 
 os = `uname -s`.strip.downcase
 OS = case os
