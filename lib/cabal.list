@@ -11,3 +11,5 @@ warp-2.1.5.2
 hashable-1.2.2.0
 enumerator-0.4.20
 aeson-0.7.0.6
+yaml-0.8.8.3
+yaml-config-0.2.2

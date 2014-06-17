@@ -1,36 +1,33 @@
 namespace :mesos do
   desc "install"
-  task :install => 'mesos:_install:default'
+  task :install => 'mesos:opt:default'
 
   desc "build"
-  task :build => 'mesos:_install:build'
+  task :build => 'mesos:opt:build'
 
   desc "check"
-  task :check => 'mesos:_install:check'
+  task :check => 'mesos:opt:check'
 
   desc "clean"
-  task :clean => 'mesos:_install:clean'
+  task :clean => 'mesos:opt:clean'
 
   desc "clobber"
-  task :clobber => 'mesos:_install:clobber'
+  task :clobber => 'mesos:opt:clobber'
 
-  namespace :_install do
+  namespace :opt do
     MESOS_VER = '0.19.0'
     MESOS_URL = "http://www.apache.org/dist/mesos/#{MESOS_VER}/mesos-#{MESOS_VER}.tar.gz"
     MESOS_TAR = "/var/tmp/#{MESOS_URL.split('/').last}"
     MESOS_DIR = MESOS_TAR.split('.').first(MESOS_TAR.split('.').size-2).join('.')
 
-    task :default => :install
+    task :default => [:pkgs, :build, :install]
 
     desc "install mesos from source"
-    task :install => [:pkgs, :build] do |t,arg|
+    task :install do
       Dir.chdir "#{MESOS_DIR}/build" do
-        sh "sudo make install"
+        sh 'sudo make install'
       end
     end
-    
-    # build from source
-    #task :build => [MESOS_DIR]
 
     task :build => MESOS_DIR do
       Dir.chdir "#{MESOS_DIR}/src/java" do

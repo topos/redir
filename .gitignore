@@ -4,9 +4,10 @@ Spec
 *.dyn_hi
 *.o
 *.dyn_o
-opt
 .bundle
 .cabal*
 .ghc
+.python-*
+opt
 cabal.sandbox.config
 cloud-haskell

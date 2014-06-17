@@ -27,6 +27,11 @@ namespace :cabal do
     end
   end
 
+  desc "remote cabal list"
+  task :rlist, [:cabal] do |t,arg|
+    task('cabal:list').invoke(arg.cabal,'r')
+  end
+
   desc "list cabal-sandbox packages"
   task :list, [:cabal,:remote] do |t,arg|
     Dir.chdir(PROJ_DIR) do

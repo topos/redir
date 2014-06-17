@@ -45,8 +45,9 @@ EXPOSE 11211
   end
 
   desc "install docker"
-  task :install => 'docker:_install:default'
-  namespace :_install do
+  task :install => 'docker:opt:default'
+
+  namespace :opt do
     task :default => :install
 
     task :install => [:pkgs,:user_access] do
@@ -62,6 +63,23 @@ EXPOSE 11211
     task :pkgs do
       ['apt-get update -y','apt-get install -y docker.io'].each do |c|
         sh "sudo #{c}"
+      end
+    end
+    
+    # from source
+    VERSION = '1.0.0'
+    DOCKER_URL = "https://github.com/dotcloud/docker/archive/v#{VERSION}.zip"
+    DOCKER_ZIP = "/var/tmp/docker-#{VERSION}.zip"
+    DOCKER_DIR = DOCKER_ZIP.gsub(/\.zip$/,'')
+
+    file DOCKER_ZIP do
+      sh "wget --output-document='#{DOCKER_ZIP}' #{DOCKER_URL}"
+      sh "cd /var/tmp && unzip #{DOCKER_ZIP}"
+    end
+
+    task :build => [DOCKER_ZIP] do
+      Dir.chdir DOCKER_DIR do
+        sh 'make BINDIR=/opt/docker'
       end
     end
   end
