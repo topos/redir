@@ -58,9 +58,9 @@ end
 
 def src_files(spec_too =false)
   if spec_too
-    FileList.new(SRC_DIR + '/**/*.hs').exclude(/main\.hs$/).join(' ')
+    FileList.new(SRC_DIR + '/**/*.hs').exclude(/Main\.hs$/).join(' ')
   else
-    FileList.new(SRC_DIR + '/**/*.hs').exclude(/.*Spec\.hs$|spec\.hs$/).join(' ')
+    FileList.new(SRC_DIR + '/**/*.hs').exclude(/.*Spec\.hs$|Spec\.hs$/).join(' ')
   end
 end
 
