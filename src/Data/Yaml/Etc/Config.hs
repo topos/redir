@@ -12,13 +12,15 @@ data Redirect = Redirect {statusCode :: Int,
                          } deriving (Generic,Eq,Show)
 instance FromJSON Redirect
 
-readConfig :: String -> IO Redirect
+data RedirectList = RedirectList [Redirect] deriving (Generic,Eq,Show)
+instance FromJSON RedirectList
+
+readConfig :: String -> IO RedirectList
 readConfig file = do
   let rfile = if file == "" then
                   "./etc/redirect.yml"
               else
                   file
-  -- either (error . show) id <$> decodeFileEither rfile
   either throw id <$> decodeFileEither rfile
 
 -- without Generic

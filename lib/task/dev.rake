@@ -44,7 +44,7 @@ namespace :dev do
   desc "clean"
   task :clean, [:dev] do |t,arg|
     Dir.chdir(SRC_DIR) do
-      fs = FileList.new(['*Spec','*_o','*_hi','*.hc'].map{|g|"./**/#{g}"})
+      fs = FileList.new(['*Spec','*.o','*.hi','*.hc'].map{|g|"./**/#{g}"})
       sh "rm -f Main #{fs.join(' ')}"
     end
   end
