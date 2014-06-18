@@ -1,22 +1,28 @@
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE OverloadedStrings #-}
-module Data.Yaml.Etc.Config (readConfig) where
+module Data.Yaml.Etc.Config where
 
 import GHC.Generics
 import Control.Applicative
 import Control.Exception
 import Data.Yaml (FromJSON, decodeFileEither)
 
-data Redirect = Redirect {statusCode :: Int, 
-                          src, dst :: String
+data Redirect = Redirect {statusCode :: Int
+                         ,src, dst :: String
                          } deriving (Generic,Eq,Show)
 instance FromJSON Redirect
 
-data RedirectList = RedirectList [Redirect] deriving (Generic,Eq,Show)
-instance FromJSON RedirectList
+data Redirects = Redirects {list :: [Redirect]} deriving (Generic,Eq,Show)
+instance FromJSON Redirects
 
-readConfig :: String -> IO RedirectList
-readConfig file = do
+redirects :: String -> IO [Redirect]
+redirects file = do
+  y <- yaml file
+  let rs = list y
+  return rs 
+
+yaml :: String -> IO Redirects
+yaml file = do
   let rfile = if file == "" then
                   "./etc/redirect.yml"
               else

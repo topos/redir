@@ -1,3 +1,4 @@
-[{statusCode: 301, src: "http://1_src_",  dst: "http://1_dst_"}
-, {statusCode: 301, src: "http://1_src_",  dst: "http://1_dst_"}
-]
+list: 
+  - {statusCode: 301, src: "http://1_src_",  dst: "http://1_dst_"}
+  - {statusCode: 301, src: "http://1_src_",  dst: "http://1_dst_"}
+
