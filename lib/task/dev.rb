@@ -97,7 +97,7 @@ GHC = "ghc #{GHC_OPT} -threaded"
 _path = []
 _path << "#{PROJ_DIR}/bin"
 _path << "#{PROJ_DIR}/.cabal-sandbox/bin"
-_path << "#{PROJ_DIR}/.cabal/bin"
+_path << (sys_name?('darwin') ? '/Users' : '/home') + "/#{ENV['LOGNAME']}/.cabal/bin"
 _path << (sys_name?('darwin') ? '~/Library/Haskell/bin' : '/opt/ghc/bin')
 _path << '/usr/local/bin'
 _path << '/usr/bin'

@@ -82,7 +82,7 @@ namespace :cabal do
   end
   
   desc "init. your cabal sandbox"
-  task :init, [:force] => ['dot_cabal:init'] do |t,arg|
+  task :init, [:force] do |t,arg|
     unless Dir.exists?("#{PROJ_DIR}/.cabal-sandbox") && arg[:force].nil?
       Dir.chdir(PROJ_DIR) do
         task('cabal:sandbox').invoke
@@ -92,26 +92,6 @@ namespace :cabal do
     end
   end
 
-  # if Dir.exists?("#{PROJ_DIR}/.cabal-sandbox")
-  namespace :dot_cabal do
-    ENV['HOME'] = PROJ_DIR
-
-    task :init do
-      unless Dir.exists?("#{PROJ_DIR}/.cabal-sandbox")
-        task('dot_cabal:update').invoke
-        task('dot_cabal:install').invoke
-      end
-    end
-
-    task :update do
-      Dir.chdir ENV['HOME'] {sh "cabal update"}
-    end
-    
-    task :install do
-      Dir.chdir ENV['HOME'] {sh "cabal install cabal-install"}
-    end
-  end
-  
   task :sandbox do
     sh "cabal update"
     sh "cabal install cabal-install"
@@ -136,7 +116,7 @@ namespace :cabal do
   end
 
   namespace :cabal_install do
-    task :install_from_src => [:dot_cabal] do
+    task :install_from_src do
       VERSION = '1.18.0.3'
       CABAL_INST = "cabal-install-#{VERSION}"
       Dir.chdir('/var/tmp') do
@@ -164,15 +144,7 @@ namespace :cabal do
   end
 
   desc "clobber: clean slate"
-  task :clobber => [:clobber_sandbox, :clobber_dot_cabal]
-
-  desc "clobber (remove) local <PROJ_DIR>/.cabal"
-  task :clobber_dot_cabal do
-    Dir.chdir(PROJ_DIR) do
-      sh "rm -rf .cabal || exit 0"
-      sh "rm -rf .ghc || exit 0"
-    end
-  end
+  task :clobber => [:clobber_sandbox]
 
   desc "clobber (remove) your cabal sandbox"
   task :clobber_sandbox do

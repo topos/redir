@@ -1,4 +1,5 @@
 list: 
-  - {statusCode: 301, src: "http://1_src_",  dst: "http://1_dst_"}
-  - {statusCode: 301, src: "http://1_src_",  dst: "http://1_dst_"}
+  - {statusCode: 301, src: "http://1_src_", dst: "http://10_dst_"}
+  - {statusCode: 301, src: "http://2_src_", dst: "http://20_dst_"}
+  - {statusCode: 301, src: "http://test", dst: "http://test.com/uri/"}
 

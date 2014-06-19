@@ -1,33 +1,38 @@
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE OverloadedStrings #-}
-module Data.Yaml.Etc.Config where
+module Data.Yaml.Etc.Config (redirects,dst,src,statusCode) where
 
 import GHC.Generics
-import Control.Applicative
 import Control.Exception
-import Data.Yaml (FromJSON, decodeFileEither)
-
-data Redirect = Redirect {statusCode :: Int
-                         ,src, dst :: String
-                         } deriving (Generic,Eq,Show)
-instance FromJSON Redirect
+import Control.Applicative ((<$>))
+import Data.Yaml (FromJSON,decodeFileEither)
 
 data Redirects = Redirects {list :: [Redirect]} deriving (Generic,Eq,Show)
 instance FromJSON Redirects
 
-redirects :: String -> IO [Redirect]
-redirects file = do
-  y <- yaml file
-  let rs = list y
-  return rs 
+type Url = String
 
-yaml :: String -> IO Redirects
+data Redirect = Redirect {statusCode :: Int
+                         ,src :: Url
+                         ,dst :: Url
+                         } deriving (Generic,Eq,Show)
+instance FromJSON Redirect
+
+type Filename = String
+
+redirects :: Filename -> IO [Redirect]
+redirects f = do
+  y <- yaml f
+  let rs = list y
+  return rs
+
+yaml :: Filename -> IO Redirects
 yaml file = do
-  let rfile = if file == "" then
-                  "./etc/redirect.yml"
-              else
-                  file
-  either throw id <$> decodeFileEither rfile
+  let f = if file == "" then 
+              "./etc/redirect.yml"
+          else 
+              file
+  either throw id <$> decodeFileEither f
 
 -- without Generic
 -- instance FromJSON Redirect where
