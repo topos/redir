@@ -86,14 +86,16 @@ OS = case os
 GHC_VERSION = '7.8.2'
 GHC_PACKAGE_PATH = "#{PROJ_DIR}/.cabal-sandbox/x86_64-#{OS}-ghc-#{GHC_VERSION}-packages.conf.d"
 CABAL_SANDBOX_DIR = "#{PROJ_DIR}/.cabal-sandbox"
-EXTRA_INC_DIR = "/opt/zmq/include"
-EXTRA_LIB_DIR = "/opt/zmq/lib"
-EXTRA_INC, EXTRA_LIB = ['#{EXTRA_INC_DIR}',"-L#{EXTRA_LIB_DIR} -lzmq"]
+#EXTRA_INC_DIR = "/opt/zmq/include"
+#EXTRA_LIB_DIR = "/opt/zmq/lib"
+#EXTRA_INC, EXTRA_LIB = ['#{EXTRA_INC_DIR}',"-L#{EXTRA_LIB_DIR} -lzmq"]
+EXTRA_INC_DIR,EXTRA_LIB_DIR = ['','']
+EXTRA_INC,EXTRA_LIB = ['','']
+
 GHC_OPT = "-no-user-package-db -package-db #{PROJ_DIR}/.cabal-sandbox/*-#{GHC_VERSION}-packages.conf.d"
 #GHC = "ghc #{GHC_PACKAGE_PATH.split.map{|p|"-package-db #{p}"}.join(' ')} -hide-package monads-tf -threaded"
 GHC = "ghc #{GHC_OPT} -threaded"
 
-# ~/.cabal/bin is important since the latest version of cabal-install will go there
 _path = []
 _path << "#{PROJ_DIR}/bin"
 _path << "#{PROJ_DIR}/.cabal-sandbox/bin"
