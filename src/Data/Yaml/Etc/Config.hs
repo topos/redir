@@ -1,13 +1,15 @@
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE OverloadedStrings #-}
-module Data.Yaml.Etc.Config (redirects,dst,src,statusCode) where
+module Data.Yaml.Etc.Config (redirects,url,src,dst,statusCode,yaml) where
 
 import GHC.Generics
 import Control.Exception
 import Control.Applicative ((<$>))
 import Data.Yaml (FromJSON,decodeFileEither)
 
-data Redirects = Redirects {list :: [Redirect]} deriving (Generic,Eq,Show)
+data Redirects = Redirects {redirects :: [Redirect]
+                           ,url :: Redirect
+                           } deriving (Generic,Eq,Show)
 instance FromJSON Redirects
 
 type Url = String
@@ -20,12 +22,6 @@ instance FromJSON Redirect
 
 type Filename = String
 
-redirects :: Filename -> IO [Redirect]
-redirects f = do
-  y <- yaml f
-  let rs = list y
-  return rs
-
 yaml :: Filename -> IO Redirects
 yaml file = do
   let f = if file == "" then 
@@ -33,13 +29,3 @@ yaml file = do
           else 
               file
   either throw id <$> decodeFileEither f
-
--- without Generic
--- instance FromJSON Redirect where
---     parseJSON (Object v) = Redirect <$>
---                            v .: "statusCode" <*>
---                            v .: "src" <*>
---                            v .: "dst"
---     -- A non-Object value is of the wrong type, so fail.
---     parseJSON _ = error "can't parse redirect rules from YAML/JSON"
-

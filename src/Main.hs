@@ -19,20 +19,13 @@ main = run 8080 app
 
 app :: Application
 app req res = do
-  rs <- C.redirects ""
-  let ps = map (\u->(C.src u,C.dst u)) rs
+  y <- C.yaml ""
+  let rs = C.redirects y
+      u = C.dst $ C.url y
+  let ps = map (\r->(C.src r,C.dst r)) rs
       m = M.fromList ps
-      url = case M.lookup "http://2_src_" m of
-              Nothing -> "http://foo.com/default/"
-              Just u -> u
-      -- url = fst $ head ps
+      url = case M.lookup "http://sh" m of
+              Nothing -> u
+              Just u' -> u'
+  print ps
   res $ responseLBS status200 [("Content-Type","text/plain"),("Location",pack url)] ""
-
--- responseLBS status301 [("Content-Type", "text/plain"), ("Location", "http://foo.com/")] ""
-
--- let ps = pathInfo req
--- k = if null ps then "" else ps !! 0
--- h = M.fromList [("hs","http://reddit.com/r/haskell"),("sci","http://hi.there.io"),("apple", "http://apple.com")]
--- r = case M.lookup k h of
---       Just r' -> r'
---       Nothing -> "http://phys.org"

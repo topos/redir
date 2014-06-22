@@ -1,5 +1,9 @@
-list: 
-  - {statusCode: 301, src: "http://1_src_", dst: "http://10_dst_"}
-  - {statusCode: 301, src: "http://2_src_", dst: "http://20_dst_"}
-  - {statusCode: 301, src: "http://test", dst: "http://test.com/uri/"}
+redirects:
+  - {statusCode: 301, src: "http://h", dst: "http://reddit.com/r/haskell"}
+  - {statusCode: 301, src: "http://sh", dst: "http://reddit.com/r/strictly_haskell"}
+  - {statusCode: 301, src: "http://p", dst: "http://reddit.com/r/politics"}
+
+url: 
+  {statusCode: 301, src: "http://*", dst: "http://google.com"}
+
 
