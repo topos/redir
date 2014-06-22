@@ -155,7 +155,7 @@ namespace :cabal do
         end
       else
         puts "#{SANDBOX_DIR} doesn't exist".red
-        puts "manually removing cabal sandbox".yellow
+        puts "explicitly removing cabal sandbox".yellow
       end
     ensure
       sh "rm -rf #{SANDBOX_DIR}"

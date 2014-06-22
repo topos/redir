@@ -14,7 +14,7 @@ desc "test code".green
 task :t => :test
 
 task :start_src_dev => ['dev:start']
-task :stop => ['db:stop', 'es:stop']
+task :stop => ['db:stop','es:stop']
 task :spec => 'dev:spec'
 task :test => 'dev:test'
 task :clean => 'dev:clean'
