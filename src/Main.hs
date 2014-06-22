@@ -6,7 +6,7 @@ import Control.Exception (try)
 import Data.ByteString.Char8 (pack)
 import Data.Maybe (fromMaybe)
 import Data.ByteString (ByteString)
-import Data.Text (Text)
+import Data.Text (Text,unpack)
 import Data.Text.Encoding (encodeUtf8)
 import Network.Wai (Application,pathInfo,responseLBS)
 import Network.HTTP.Types (status200,status301,status302)
@@ -20,12 +20,13 @@ main = run 8080 app
 app :: Application
 app req res = do
   y <- C.yaml ""
-  let rs = C.redirects y
+  let k = unpack $ head $  pathInfo req
       u = C.dst $ C.url y
-  let ps = map (\r->(C.src r,C.dst r)) rs
+      rs = C.redirects y
+      ps = map (\r->(C.src r,C.dst r)) rs
       m = M.fromList ps
-      url = case M.lookup "http://sh" m of
+      url = case M.lookup ("http://" ++ k) m of
               Nothing -> u
               Just u' -> u'
-  print ps
+  print $ pathInfo req
   res $ responseLBS status200 [("Content-Type","text/plain"),("Location",pack url)] ""
