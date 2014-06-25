@@ -20,9 +20,9 @@ namespace :run do
     task('run:default').invoke('Spec', arg.opts)
   end
 
-  desc "run redird"
-  task :redird, [:opts] do |t,arg|
-    Dir.chdir 
+  desc "run redir"
+  task :redir, [:opts] do |t,arg|
+    sh "sudo docker run -d -t -p 127.0.0.1:8080:8080 redir"
   end
 
   desc "curl"
