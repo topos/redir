@@ -71,7 +71,9 @@ end
 
 PROJ_DIR = File.expand_path("#{File.dirname(__FILE__)}/../../.")
 SRC_DIR = proj_dir('src')
+ETC_DIR = proj_dir('etc')
 LIB_DIR = proj_dir('lib')
+DIST_DIR = proj_dir('dist')
 TASK_DIR = proj_dir('lib/task')
 SANDBOX_DIR = proj_dir('.cabal-sandbox')
 PROJ_HOME = PROJ_DIR

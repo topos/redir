@@ -15,7 +15,6 @@ namespace :dev do
       sleep
     end
   end
-
   task :all do
     Dir.chdir(SRC_DIR) do
       make_spec
@@ -38,7 +37,13 @@ namespace :dev do
 
   desc "install app"
   task :install, [:dev] do |t,arg|
-    sh "#{['clean', 'configure', 'install'].map{|s|"#{cabal(arg)} #{s}"}.join(' && ')}"
+    Dir.chdir DIST_DIR do
+      sh 'sudo cp -a redir /var/tmp'
+    end
+    Dir.chdir '/var/tmp/redir' do
+      sh 'sudo chown root:root .'
+      sh 'sudo chmod -R 0555 .'
+    end
   end
 
   desc "clean"
@@ -71,7 +76,8 @@ namespace :dev do
 
   desc "init dev. env.: cabal-dev install"
   #task :init => [:gems, 'zmq:install'] do
-  task :init => [:gems] do
+  task :init => [:gems,:dist] do
+    sh "mkdir -p #{DIST_DIR}/redir"
     task('cabal:init').invoke
   end
 

@@ -20,6 +20,11 @@ namespace :run do
     task('run:default').invoke('Spec', arg.opts)
   end
 
+  desc "run redird"
+  task :redird, [:opts] do |t,arg|
+    Dir.chdir 
+  end
+
   desc "curl"
   task :curl, [:url] do |t,arg| 
     arg.with_defaults(url: 'http://localhost:8080/')

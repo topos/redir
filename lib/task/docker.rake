@@ -14,6 +14,17 @@ namespace :docker do
     sh 'sudo service docker start'
   end
 
+  # semantically similiar to its Dockerfile
+  desc "make a docker container for redir"
+  task :redir do
+    sh "sudo rm -rf /var/tmp/redir"
+    sh "mkdir -p /var/tmp/redir"
+    sh "cp #{SRC_DIR}/Main /var/tmp/redir/redird"
+    sh "cp #{ETC_DIR}/redirect.yml /var/tmp/redir/"
+    sh "cp #{LIB_DIR}/docker/redir/Dockerfile /var/tmp/redir/"
+    task('docker:mk').invoke('/var/tmp/redir','redir')
+  end
+
   desc 'list conainers'
   task :list, [:ltype] do |t,arg|
     arg.with_defaults(ltype:'c') # (c)ontainer or (i)mage
@@ -42,7 +53,9 @@ namespace :docker do
   task :mk, [:docker_dir,:name] do |t,arg|
     raise "no docker_dir arg.".red if arg.docker_dir.nil?
     arg.with_defaults(name: arg.docker_dir)
-    sh "sudo docker build -t=#{arg.name} - < #{LIB_DIR}/docker/#{arg.docker_dir}/Dockerfile"
+    Dir.chdir arg.docker_dir do
+      sh "sudo docker build -t=#{arg.name} ."
+    end
   end
 
   desc 'list of docker files'
@@ -84,13 +97,13 @@ EOF
   end
 
   desc 'install docker'
-  task :install => 'docker:pkg:default'
+  task :install => 'docker:install:pkg'
 
-  namespace :pkg do
+  namespace :install do
     DOCKER_LIST = '/etc/apt/sources.list.d/docker.list'
 
-    desc 'install docker'
-    task :default => [:keychain, :repo, :update, :install]
+    desc 'install docker pkg'
+    task :pkg => [:keychain, :repo, :update, :install]
 
     desc "apt-get install lxc-docker"
     task :install do

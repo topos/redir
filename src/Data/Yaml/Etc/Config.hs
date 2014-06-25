@@ -24,8 +24,5 @@ type Filename = String
 
 yaml :: Filename -> IO Redirects
 yaml file = do
-  let f = if file == "" then 
-              "./etc/redirect.yml"
-          else 
-              file
+  let f = if file == "" then "./etc/redirect.yml" else file
   either throw id <$> decodeFileEither f

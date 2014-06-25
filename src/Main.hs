@@ -1,5 +1,4 @@
-{-# LANGUAGE Rank2Types #-}
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE Rank2Types,OverloadedStrings,ScopedTypeVariables #-}
 module Main where
 
 import Control.Exception (try)
@@ -13,13 +12,14 @@ import Network.HTTP.Types (status200,status301,status302)
 import Network.Wai.Handler.Warp (run)
 import qualified Data.Map as M
 import qualified Data.Yaml.Etc.Config as C
+import Arg
 
 main :: IO ()
 main = run 8080 app
 
 app :: Application
 app req res = do
-  y <- C.yaml ""
+  y <- C.yaml "./redirect.yml"
   let k = if (pathInfo req) == [] then
               "url"
           else

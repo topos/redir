@@ -1,16 +1,18 @@
 {-# LANGUAGE TemplateHaskell #-}
-module Arg (args,ip,port,help,usage,printUsage,Options(..)) where
+module Arg (args,ip,port,redirectFile,help,usage,printUsage,Options(..)) where
 
 import System.Console.GetOpt
 import System.Environment (getArgs,getProgName)
 import Control.Lens
 
-data Options = Options{_ip::String
-                      ,_port::Int
-                      ,_help::Bool} 
+data Options = Options{_ip :: String
+                      ,_port :: Int
+                      ,_redirectFile :: String
+                      ,_help :: Bool} 
                deriving Show
 defaultOptions = Options{_ip="127.0.0.1"
                         ,_port=8080
+                        ,_redirectFile="./etc/redirect.yaml"
                         ,_help=False}
 makeLenses ''Options
 
@@ -21,6 +23,9 @@ options = [Option ['i'] ["ip"]
           ,Option ['p'] ["port"]
            (ReqArg (\p opts -> opts{_port=(read p)}) "port")
            "port"
+          ,Option ['r'] ["redirectFile"]
+           (ReqArg (\r opts -> opts{_redirectFile=r}) "redirectFile")
+           "redirectFile"
           ,Option ['h'] ["help"]
            (NoArg (\opts -> opts{_help=True}))
            "help"]
