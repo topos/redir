@@ -12,21 +12,10 @@ namespace :docker do
   desc 'make container'
   task :mk, [:docker_dir,:name] do |t,arg|
     raise "no docker_dir arg.".red if arg.docker_dir.nil?
-    arg.with_defaults(name: arg.docker_dir)
+    raise "no name arg.".red if arg.name.nil?
     Dir.chdir arg.docker_dir do
-      sh "sudo docker build -t=#{arg.name} ."
+      sh "sudo docker build --rm --tag=#{arg.name} ."
     end
-  end
-
-  # semantically similiar to its Dockerfile
-  desc "make a docker container for redir"
-  task :redir do
-    sh "sudo rm -rf /var/tmp/redir"
-    sh "mkdir -p /var/tmp/redir"
-    sh "cp #{SRC_DIR}/Main /var/tmp/redir/redird"
-    sh "cp #{ETC_DIR}/redirect.yml /var/tmp/redir/"
-    sh "cp #{LIB_DIR}/docker/redir/Dockerfile /var/tmp/redir/"
-    task('docker:mk').invoke('/var/tmp/redir','redir')
   end
 
   desc 'list of docker files'
@@ -91,8 +80,10 @@ EOF
 
     desc "stop all or a list of container IDs"
     task :start, [:ids] do |t,arg|
-      raise "container ID' is required" if arg.cid.nil?
-      sh "docker start #{arg.cid}"
+      raise "container ID' is required" if arg.ids.nil?
+      arg.ids.split.each do |id|
+        sh "docker start #{id}"
+      end
     end
 
     desc "clean (remove) stopped containers"

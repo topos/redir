@@ -19,7 +19,7 @@ main = run 8080 app
 
 app :: Application
 app req res = do
-  y <- C.yaml "./redirect.yml"
+  y <- C.yaml "/etc/redir.yml"
   let k = if (pathInfo req) == [] then
               "url"
           else

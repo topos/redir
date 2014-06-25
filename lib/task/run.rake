@@ -21,8 +21,12 @@ namespace :run do
   end
 
   desc "run redir"
-  task :redir, [:opts] do |t,arg|
-    sh "sudo docker run -d -t -p 127.0.0.1:8080:8080 redir"
+  task :redir, [:debug,:opts] do |t,arg|
+    if arg.debug.nil? || arg.debug == ''
+      sh "docker run --detach --tty --publish 127.0.0.1:8080:8080 redir"
+    else
+      sh "docker run --attach --tty --publish 127.0.0.1:8080:8080 redir"
+    end
   end
 
   desc "curl"
