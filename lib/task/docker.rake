@@ -1,44 +1,4 @@
 namespace :docker do
-  desc 'restart docker daemon'
-  task :restart do
-    sh 'sudo service docker restart'
-  end
-
-  desc 'restart docker daemon'
-  task :stop do
-    sh 'sudo service docker stop'
-  end
-
-  desc 'restart docker daemon'
-  task :start do
-    sh 'sudo service docker start'
-  end
-
-  # semantically similiar to its Dockerfile
-  desc "make a docker container for redir"
-  task :redir do
-    sh "sudo rm -rf /var/tmp/redir"
-    sh "mkdir -p /var/tmp/redir"
-    sh "cp #{SRC_DIR}/Main /var/tmp/redir/redird"
-    sh "cp #{ETC_DIR}/redirect.yml /var/tmp/redir/"
-    sh "cp #{LIB_DIR}/docker/redir/Dockerfile /var/tmp/redir/"
-    task('docker:mk').invoke('/var/tmp/redir','redir')
-  end
-
-  desc 'list conainers'
-  task :list, [:ltype] do |t,arg|
-    arg.with_defaults(ltype:'c') # (c)ontainer or (i)mage
-    ltype = arg.ltype[0].downcase
-    case ltype
-    when 'c'
-      sh "docker ps --all"
-    when 'i'
-      sh "docker images --all"
-    else
-      raise $!
-    end
-  end
-
   desc 'run bash within a container'
   task :sh, [:cmd,:image] do |t,arg|
     arg.with_defaults(image:'ubuntu')
@@ -58,35 +18,48 @@ namespace :docker do
     end
   end
 
+  # semantically similiar to its Dockerfile
+  desc "make a docker container for redir"
+  task :redir do
+    sh "sudo rm -rf /var/tmp/redir"
+    sh "mkdir -p /var/tmp/redir"
+    sh "cp #{SRC_DIR}/Main /var/tmp/redir/redird"
+    sh "cp #{ETC_DIR}/redirect.yml /var/tmp/redir/"
+    sh "cp #{LIB_DIR}/docker/redir/Dockerfile /var/tmp/redir/"
+    task('docker:mk').invoke('/var/tmp/redir','redir')
+  end
+
   desc 'list of docker files'
   task :files do
-    sh "ls #{LIB_DIR}/docker"
+    sh "ls #{LIB_DIR}/docker".green
   end
 
   desc 'info'
   task :info do
-    sh "which docker", :verbose => false
-    sh "docker --version", :verbose => false
-    sh "docker version"
-    puts "---".green
-    puts <<EOF
-Memory and Swap Accounting
-If you want to enable memory and swap accounting, you must add the following 
-command-line parameters to your kernel:
+    v = `docker --version`.strip
+    puts "#{v}".cyan
+    d = `which docker`.strip
+    puts "#{d}".green
 
-$ cgroup_enable=memory swapaccount=1
+    msg = <<EOF
+memory and swap accounting
+  if you want to enable memory and swap accounting, you must add the following 
+  command-line parameters to your kernel:
 
-Add the above parameters by editing /etc/default/grub and extending 
-GRUB_CMDLINE_LINUX. Look for the following line:
+  $ cgroup_enable=memory swapaccount=1
 
-$ GRUB_CMDLINE_LINUX=""
-p
-And replace it with the following:
-$ GRUB_CMDLINE_LINUX="cgroup_enable=memory swapaccount=1"
+  Add the above parameters by editing /etc/default/grub and extending 
+  GRUB_CMDLINE_LINUX. Look for the following line:
 
-$ sudo update-grub
-$ reboot
+  $ GRUB_CMDLINE_LINUX=""
+
+  And replace it with the following:
+  $ GRUB_CMDLINE_LINUX="cgroup_enable=memory swapaccount=1"
+
+  $ sudo update-grub
+  $ reboot
 EOF
+    puts msg.strip.yellow
   end
 
   desc "non-root (user) access"
@@ -98,6 +71,77 @@ EOF
 
   desc 'install docker'
   task :install => 'docker:install:pkg'
+
+  # container
+  namespace :container do
+    desc "list containers"
+    task :list do
+      sh "docker ps --all"
+    end
+
+    desc "stop all or an individual container"
+    task :stop, [:cid] do |t,arg|
+      raise "container ID or 'all' is required" if arg.cid.nil?
+      if arg.cid == 'all'
+        sh "docker stop $(docker ps --all --quiet)"
+      else
+        sh "docker stop #{arg.cid}"
+      end
+    end
+
+    desc "stop all or a list of container IDs"
+    task :start, [:ids] do |t,arg|
+      raise "container ID' is required" if arg.cid.nil?
+      sh "docker start #{arg.cid}"
+    end
+
+    desc "clean (remove) stopped containers"
+    task :clean do
+      begin
+        sh "docker rm $(docker ps --quiet --all)"
+      rescue
+        puts $!
+      end
+    end
+  end
+  
+  # container
+  namespace :image do
+    desc "list images"
+    task :list do
+      begin
+        sh "docker images --all"
+      rescue
+        puts $!
+      end
+    end
+
+    desc "clean (remove) untagged containers"
+    task :clean do
+      begin
+        sh "docker images --all | egrep '^<none>' | awk '{print $3}' | xargs docker rmi --force"
+      rescue
+        puts $!
+      end
+    end
+  end
+
+  namespace :daemon do
+    desc 'restart docker daemon'
+    task :restart do
+      sh 'sudo service docker restart'
+    end
+
+    desc 'stop docker daemon'
+    task :stop do
+      sh 'sudo service docker stop'
+    end
+
+    desc 'start docker daemon'
+    task :start do
+      sh 'sudo service docker start'
+    end
+  end
 
   namespace :install do
     DOCKER_LIST = '/etc/apt/sources.list.d/docker.list'
