@@ -20,7 +20,10 @@ main = run 8080 app
 app :: Application
 app req res = do
   y <- C.yaml ""
-  let k = unpack $ head $  pathInfo req
+  let k = if (pathInfo req) == [] then
+              "url"
+          else
+              unpack $ head $ pathInfo req
       u = C.dst $ C.url y
       rs = C.redirects y
       ps = map (\r->(C.src r,C.dst r)) rs
@@ -28,5 +31,4 @@ app req res = do
       url = case M.lookup ("http://" ++ k) m of
               Nothing -> u
               Just u' -> u'
-  print $ pathInfo req
   res $ responseLBS status200 [("Content-Type","text/plain"),("Location",pack url)] ""
