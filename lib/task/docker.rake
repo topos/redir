@@ -35,7 +35,7 @@ memory and swap accounting
   if you want to enable memory and swap accounting, you must add the following 
   command-line parameters to your kernel:
 
-  $ cgroup_enable=memory swapaccount=1
+  $ cgroup_enable=memory swapaccount=1https://github.com/sinatra/sinatra-contrib/issues/111
 
   Add the above parameters by editing /etc/default/grub and extending 
   GRUB_CMDLINE_LINUX. Look for the following line:

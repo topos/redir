@@ -4,18 +4,6 @@ ENV['HOME'] = PROJ_DIR # hack to keep .cabal under this project dir.
 
 Dir.glob("#{PROJ_HOME}/lib/task/*.rake"){|p| import p}
 
-# semantically similiar to its ./lib/redir/Dockerfile
-desc "make a docker container for redir"
-task :redir => [:clean,:c] do
-  sh "sudo rm -rf /var/tmp/redir"
-  sh "mkdir -p /var/tmp/redir"
-  sh "cp #{SRC_DIR}/Main /var/tmp/redir/redir"
-  sh "cp #{ETC_DIR}/redir.yml /var/tmp/redir/redir.yml"
-  sh "cp #{LIB_DIR}/docker/redir/Dockerfile /var/tmp/redir/"
-  task('docker:mk').reenable
-  task('docker:mk').invoke('/var/tmp/redir','redir')
-end
-
 desc "start src development".green
 task :cc => :start_src_dev
 
@@ -41,3 +29,27 @@ task :spec, [:opts] => 'run:spec'
 task :ab, [:clients,:requests,:url,:opts] => 'run:ab'
 
 task :default do; sh "rake -T", verbose: false; end
+
+# semantically similiar to its ./lib/redir/Dockerfile
+desc "make a docker container for redir"
+task :redir => [:clean,:c] do
+  sh "sudo rm -rf /var/tmp/redir"
+  sh "mkdir -p /var/tmp/redir"
+  sh "cp #{SRC_DIR}/Main /var/tmp/redir/redir"
+  sh "cp #{ETC_DIR}/redir.yml /var/tmp/redir/redir.yml"
+  sh "cp #{LIB_DIR}/docker/redir/Dockerfile /var/tmp/redir/"
+  task('docker:mk').reenable
+  task('docker:mk').invoke('/var/tmp/redir','redir')
+end
+
+# semantically similiar to its ./lib/redir/Dockerfile
+desc "make a docker container for redir"
+task :mighttpd do |t|
+  sh "sudo rm -rf /var/tmp/#{t.name}"
+  sh "mkdir -p /var/tmp/#{t.name}"
+  sh "cp #{LIB_DIR}/docker/#{t.name}/Dockerfile /var/tmp/#{t.name}/"
+  # for generalization: some task here
+  task('docker:mk').reenable
+  task('docker:mk').invoke("/var/tmp/#{t.name}",t.name)
+end
+
