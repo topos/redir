@@ -20,24 +20,6 @@ namespace :run do
     task('run:default').invoke('Spec', arg.opts)
   end
 
-  desc "run redir"
-  task :redir, [:debug,:opts] do |t,arg|
-    if arg.debug.nil? || arg.debug == ''
-      sh "docker run --detach --tty --publish 127.0.0.1:8080:8080 redir"
-    else
-      sh "docker run -i -t --entrypoint='/bin/bash' redir"
-    end
-  end
-
-  desc "run mighttpd (mighty)"
-  task :mighttpd, [:debug,:opts] do |t,arg|
-    if arg.debug.nil? || arg.debug == ''
-      sh "sudo docker run --detach --tty --publish 127.0.0.1:80:8080 mighttpd"
-    else
-      sh "docker run --interactive --tty --entrypoint=/bin/bash mighttpd"
-    end
-  end
-
   desc "curl"
   task :curl, [:url] do |t,arg| 
     arg.with_defaults(url: 'http://localhost:8080/')
