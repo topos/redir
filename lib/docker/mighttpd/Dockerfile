@@ -6,12 +6,15 @@ RUN echo "deb http://archive.ubuntu.com/ubuntu precise main universe" >> /etc/ap
 RUN apt-get update -y 
 RUN apt-get upgrade -y
 RUN apt-get build-dep -y build-essential
-RUN apt-get install -y ghc
-RUN apt-get install -y haskell-platform
-RUN apt-get install -y libghc-warp-dev
 RUN apt-get install -y mighttpd2
 
-ENTRYPOINT ["/usr/bin/mighty"]
+RUN cd / && /usr/lib/mighttpd2/mkindex 
+
+WORKDIR /var/tmp/mighttpd
+COPY eg.conf /etc/eg.conf
+COPY eg.route /etc/eg.route
+
+ENTRYPOINT ["/usr/bin/mighty","/etc/eg.conf","/etc/eg.route"]
 
 USER daemon
-EXPOSE 80
+EXPOSE 8080

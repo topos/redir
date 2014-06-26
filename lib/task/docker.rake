@@ -14,7 +14,7 @@ namespace :docker do
     raise "no docker_dir arg.".red if arg.docker_dir.nil?
     raise "no name arg.".red if arg.name.nil?
     Dir.chdir arg.docker_dir do
-      sh "sudo docker build --rm --tag=#{arg.name} ."
+      sh "docker build --rm --tag=#{arg.name} ."
     end
   end
 
@@ -87,9 +87,14 @@ EOF
     end
 
     desc "clean (remove) stopped containers"
-    task :clean do
+    task :clean, [:cid,:opt] do |t,arg|
+      arg.with_defaults(opt:'')
       begin
-        sh "docker rm $(docker ps --quiet --all)"
+        if arg.cid.nil?
+          sh "docker rm #{arg.opt} $(docker ps --quiet --all)"
+        else
+          sh "docker rm #{arg.opt} #{arg.cid}"
+        end
       rescue
         puts $!
       end
@@ -108,9 +113,13 @@ EOF
     end
 
     desc "clean (remove) untagged containers"
-    task :clean do
+    task :clean, :cid do |t,arg|
       begin
-        sh "docker images --all | egrep '^<none>' | awk '{print $3}' | xargs docker rmi --force"
+        if arg.cid.nil?
+          sh "docker images --all | egrep '^<none>' | awk '{print $3}' | xargs docker rmi --force"
+        else
+          sh "docker rmi --force #{arg.cid}"
+        end
       rescue
         puts $!
       end

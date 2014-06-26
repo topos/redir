@@ -47,7 +47,7 @@ desc "make a docker container for redir"
 task :mighttpd do |t|
   sh "sudo rm -rf /var/tmp/#{t.name}"
   sh "mkdir -p /var/tmp/#{t.name}"
-  sh "cp #{LIB_DIR}/docker/#{t.name}/Dockerfile /var/tmp/#{t.name}/"
+  sh "cp #{LIB_DIR}/docker/#{t.name}/* /var/tmp/#{t.name}/"
   # for generalization: some task here
   task('docker:mk').reenable
   task('docker:mk').invoke("/var/tmp/#{t.name}",t.name)

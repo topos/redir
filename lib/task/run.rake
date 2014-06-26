@@ -32,7 +32,7 @@ namespace :run do
   desc "run mighttpd (mighty)"
   task :mighttpd, [:debug,:opts] do |t,arg|
     if arg.debug.nil? || arg.debug == ''
-      sh "sudo docker run --detach --tty --publish 127.0.0.1:80:80 mighttpd"
+      sh "sudo docker run --detach --tty --publish 127.0.0.1:80:8080 mighttpd"
     else
       sh "docker run --interactive --tty --entrypoint=/bin/bash mighttpd"
     end
@@ -42,6 +42,12 @@ namespace :run do
   task :curl, [:url] do |t,arg| 
     arg.with_defaults(url: 'http://localhost:8080/')
     sh "curl -D - -o - #{arg.url}"
+  end
+
+  desc "http get"
+  task :get, [:uri,:host_port,:proto] do |t,arg| 
+    arg.with_defaults(host_port:'localhost:8080',uri:'/',proto:'http')
+    sh "curl -D - -o - #{arg.proto}://#{arg.host_port}/#{arg.uri}"
   end
 
   desc "run apache bench against Main"
