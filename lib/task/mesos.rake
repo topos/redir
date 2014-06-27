@@ -1,20 +1,20 @@
 namespace :mesos do
   desc "install"
-  task :install => 'mesos:opt:default'
+  task :install => 'mesos:install:default'
 
   desc "build"
-  task :build => 'mesos:opt:build'
+  task :build => 'mesos:install:build'
 
   desc "check"
-  task :check => 'mesos:opt:check'
+  task :check => 'mesos:install:check'
 
   desc "clean"
-  task :clean => 'mesos:opt:clean'
+  task :clean => 'mesos:install:clean'
 
   desc "clobber"
-  task :clobber => 'mesos:opt:clobber'
+  task :clobber => 'mesos:install:clobber'
 
-  namespace :opt do
+  namespace :install do
     MESOS_VER = '0.19.0'
     MESOS_URL = "http://www.apache.org/dist/mesos/#{MESOS_VER}/mesos-#{MESOS_VER}.tar.gz"
     MESOS_TAR = "/var/tmp/#{MESOS_URL.split('/').last}"

@@ -32,7 +32,7 @@ namespace :dev do
 
   desc "build app"
   task :build, [:dev] do |t,arg|
-    sh "#{['clean', 'configure', 'build'].map{|s|"#{cabal(arg)} #{s}"}.join(' && ')}"
+    puts "@todo: implement".red
   end
 
   desc "install app"

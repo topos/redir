@@ -31,44 +31,71 @@ task :ab, [:clients,:requests,:url,:opts] => 'run:ab'
 task :default do; sh "rake -T", verbose: false; end
 
 namespace :app do
-  desc "run redir"
-  task :start_redir, [:debug,:opts] do |t,arg|
-    if arg.debug.nil? || arg.debug == ''
-      sh "docker run --detach --tty --publish 127.0.0.1:8080:8080 redir"
-    else
-      sh "docker run -i -t --entrypoint='/bin/bash' redir"
+  namespace :start do
+    desc "start redir"
+    task :redir, [:debug,:opts] do |t,arg|
+      start('redir','--detach --tty --publish 8080:8080' + " #{arg.opts}",!arg.debug.nil?)
     end
-  end
 
-  desc "run mighttpd (mighty)"
-  task :start_mighttpd, [:debug,:opts] do |t,arg|
-    if arg.debug.nil? || arg.debug == ''
-      sh "sudo docker run --detach --tty --publish 127.0.0.1:80:8080 mighttpd"
-    else
-      sh "docker run --interactive --tty --entrypoint=/bin/bash mighttpd"
+    desc "start mighttpd (mighty)"
+    task :mighttpd, [:debug,:opts] do |t,arg|
+      start('mighttpd','--detach --tty --publish 80:8080' + " #{arg.opts}",!arg.debug.nil?)
+    end
+
+    desc "start marathon"
+    task :marathon, [:debug,:opts] do |t,arg|
+      start('marathon','--detach --tty --publish 8000:8080' + " #{arg.opts}",!arg.debug.nil?)
+    end
+
+    def start(name, opts ='', debug =false)
+      raise "missing docker-image name" if name.nil?
+      unless debug
+        sh "sudo docker run #{opts} #{name}"
+      else
+        sh "docker run --interactive --tty --user=root --entrypoint=/bin/bash #{name}"
+      end
     end
   end
 
   # semantically similiar to its ./lib/redir/Dockerfile
   desc "make a docker container for redir"
-  task :redir => [:clean,:c] do
-    sh "sudo rm -rf /var/tmp/redir"
-    sh "mkdir -p /var/tmp/redir"
-    sh "cp #{SRC_DIR}/Main /var/tmp/redir/redir"
-    sh "cp #{ETC_DIR}/redir.yml /var/tmp/redir/redir.yml"
-    sh "cp #{LIB_DIR}/docker/redir/Dockerfile /var/tmp/redir/"
-    task('docker:mk').reenable
-    task('docker:mk').invoke('/var/tmp/redir','redir')
+  task :redir => [:clean,:c] do |t|
+    path = mk_docker_dir(task2name(t.name))
+    sh "cp #{SRC_DIR}/Main #{path}/redir"
+    sh "cp #{ETC_DIR}/redir.yml #{path}/redir.yml"
+    sh "cp #{LIB_DIR}/docker/redir/Dockerfile #{path}/"
+    task('docker:mk').invoke(path,t.name)
   end
 
   # semantically similiar to its ./lib/redir/Dockerfile
-  desc "make a docker container for redir"
+  desc "make a docker container for mighttpd"
   task :mighttpd do |t|
-    sh "sudo rm -rf /var/tmp/#{t.name}"
-    sh "mkdir -p /var/tmp/#{t.name}"
-    sh "cp #{LIB_DIR}/docker/#{t.name}/* /var/tmp/#{t.name}/"
-    # for generalization: some task here
-    task('docker:mk').reenable
-    task('docker:mk').invoke("/var/tmp/#{t.name}",t.name)
+    task('app:docker').invoke(task2name(t.name))
+  end
+
+  # semantically similiar to its ./lib/redir/Dockerfile
+  desc "make a docker container for redir"
+  task :marathon do |t|
+    task('app:docker').invoke(task2name(t.name))
+  end
+
+  desc "make a docker image"
+  task :docker, :name do |t,arg|
+    raise "mising docker-image name" if arg.name.nil?
+    path = mk_docker_dir(arg.name)
+    task('docker:mk').invoke(path,arg.name)
+  end
+
+  def mk_docker_dir(name)
+    path = "/var/tmp/#{name}"
+    sh "sudo rm -rf #{path}"
+    sh "mkdir -p #{path}"
+    sh "cp #{LIB_DIR}/docker/#{name}/* #{path}"
+    path
+  end
+
+  # @todo: change below to be less error prone
+  def task2name(name)
+    name.split(':').last.strip
   end
 end
