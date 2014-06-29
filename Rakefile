@@ -47,12 +47,22 @@ namespace :app do
       start('marathon','--detach --tty --publish 8000:8080' + " #{arg.opts}",!arg.debug.nil?)
     end
 
+    desc "start dhcpd"
+    task :dhcpd, [:debug,:opts] do |t,arg|
+      start('dhcpd','--detach --tty' + " #{arg.opts}",!arg.debug.nil?)
+    end
+
+    desc "start zookeeper"
+    task :zookeeper, [:debug,:opts] do |t,arg|
+      start(task2name(t.name),'--detach --tty' + " #{arg.opts}",!arg.debug.nil?)
+    end
+
     def start(name, opts ='', debug =false)
       raise "missing docker-image name" if name.nil?
       unless debug
-        sh "sudo docker run #{opts} #{name}"
+        sh "docker run #{opts} #{name}"
       else
-        sh "docker run --interactive --tty --user=root --entrypoint=/bin/bash #{name}"
+        sh "docker run --interactive --tty --user=root --net=bridge --entrypoint=/bin/bash #{name}"
       end
     end
   end
@@ -60,11 +70,12 @@ namespace :app do
   # semantically similiar to its ./lib/redir/Dockerfile
   desc "make a docker container for redir"
   task :redir => [:clean,:c] do |t|
-    path = mk_docker_dir(task2name(t.name))
+    name = task2name t.name
+    path = mk_docker_dir(name)
     sh "cp #{SRC_DIR}/Main #{path}/redir"
     sh "cp #{ETC_DIR}/redir.yml #{path}/redir.yml"
     sh "cp #{LIB_DIR}/docker/redir/Dockerfile #{path}/"
-    task('docker:mk').invoke(path,t.name)
+    task('docker:mk').invoke(path,name)
   end
 
   # semantically similiar to its ./lib/redir/Dockerfile
@@ -76,6 +87,16 @@ namespace :app do
   # semantically similiar to its ./lib/redir/Dockerfile
   desc "make a docker container for redir"
   task :marathon do |t|
+    task('app:docker').invoke(task2name(t.name))
+  end
+
+  desc "make a docker container for dhcpd"
+  task :dhcpd do |t|
+    task('app:docker').invoke(task2name(t.name))
+  end
+
+  desc "make a docker container for dhcpd"
+  task :zookeeper do |t|
     task('app:docker').invoke(task2name(t.name))
   end
 
