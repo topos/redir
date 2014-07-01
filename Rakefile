@@ -30,39 +30,41 @@ task :ab, [:clients,:requests,:url,:opts] => 'run:ab'
 
 task :default do; sh "rake -T", verbose: false; end
 
-namespace :app do
+namespace :d do
   namespace :start do
     desc "start redir"
-    task :redir, [:debug,:opts] do |t,arg|
-      start('redir','--detach --tty --publish 8080:8080' + " #{arg.opts}",!arg.debug.nil?)
+    task :redir, [:opts,:debug] do |t,arg|
+      start('redir','--publish-all' + " #{arg.opts}",!arg.debug.nil?)
     end
 
     desc "start mighttpd (mighty)"
-    task :mighttpd, [:debug,:opts] do |t,arg|
-      start('mighttpd','--detach --tty --publish 80:8080' + " #{arg.opts}",!arg.debug.nil?)
+    task :mighttpd, [:opts,:debug] do |t,arg|
+      start('mighttpd','--publish 80:8080' + " #{arg.opts}",!arg.debug.nil?)
     end
 
     desc "start marathon"
-    task :marathon, [:debug,:opts] do |t,arg|
-      start('marathon','--detach --tty --publish 8000:8080' + " #{arg.opts}",!arg.debug.nil?)
+    task :marathon, [:opts,:debug] do |t,arg|
+      start('marathon','--publish 8000:8080' + " #{arg.opts}",!arg.debug.nil?)
     end
 
     desc "start dhcpd"
-    task :dhcpd, [:debug,:opts] do |t,arg|
-      start('dhcpd','--detach --tty' + " #{arg.opts}",!arg.debug.nil?)
+    task :dhcpd, [:opts,:debug] do |t,arg|
+      start('dhcpd',arg.opts,!arg.debug.nil?)
     end
 
     desc "start zookeeper"
-    task :zookeeper, [:debug,:opts] do |t,arg|
-      start(task2name(t.name),'--detach --tty' + " #{arg.opts}",!arg.debug.nil?)
+    task :zookeeper, [:opts,:debug] do |t,arg|
+      arg.with_defaults(opts: '')
+      start(task2name(t.name),"--publish 2181:2181 --publish 2888:2888 --publish 38888:3888 #{arg.opts}",!arg.debug.nil?)
     end
 
     def start(name, opts ='', debug =false)
+      opts = '' if opts.nil?
       raise "missing docker-image name" if name.nil?
       unless debug
-        sh "docker run #{opts} #{name}"
+        sh "docker run --detach --tty #{opts} #{name}"
       else
-        sh "docker run --interactive --tty --user=root --net=bridge --entrypoint=/bin/bash #{name}"
+        sh "docker run --interactive --tty --user=root --entrypoint=/bin/bash #{opts} #{name}"
       end
     end
   end
@@ -81,23 +83,23 @@ namespace :app do
   # semantically similiar to its ./lib/redir/Dockerfile
   desc "make a docker container for mighttpd"
   task :mighttpd do |t|
-    task('app:docker').invoke(task2name(t.name))
+    task('d:docker').invoke(task2name(t.name))
   end
 
   # semantically similiar to its ./lib/redir/Dockerfile
   desc "make a docker container for redir"
   task :marathon do |t|
-    task('app:docker').invoke(task2name(t.name))
+    task('d:docker').invoke(task2name(t.name))
   end
 
   desc "make a docker container for dhcpd"
   task :dhcpd do |t|
-    task('app:docker').invoke(task2name(t.name))
+    task('d:docker').invoke(task2name(t.name))
   end
 
   desc "make a docker container for dhcpd"
   task :zookeeper do |t|
-    task('app:docker').invoke(task2name(t.name))
+    task('d:docker').invoke(task2name(t.name))
   end
 
   desc "make a docker image"

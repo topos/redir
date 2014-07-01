@@ -15,10 +15,17 @@ RUN echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true 
 RUN apt-get install -y oracle-java8-installer
 RUN apt-get install oracle-java8-set-default
 RUN apt-get install -y python-setuptools python-software-properties curl wget
-RUN sudo apt-get install -y zookeeperd
+RUN apt-get install -y coreutils
+RUN apt-get install -y zookeeperd
+
+RUN mkdir -p /var/zookeeper
+RUN chown -R zookeeper /var/zookeeper
+
+USER zookeeper
 
 ADD zoo.cfg /etc/zookeeper/conf/
+ADD myid /etc/zookeeper/conf/
 
-USER daemon
-ENTRYPOINT ["start zookeeper"]
+EXPOSE 2181 2888 38888
 
+ENTRYPOINT ["/usr/share/zookeeper/bin/zkServer.sh","start-foreground"]

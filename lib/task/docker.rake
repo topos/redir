@@ -70,8 +70,7 @@ EOF
 
     desc "stop all or an individual container"
     task :stop, [:cid] do |t,arg|
-      raise "container ID or 'all' is required" if arg.cid.nil?
-      if arg.cid == 'all'
+      if arg.cid == 'all' || arg.cid.nil?
         sh "docker stop $(docker ps --all --quiet)"
       else
         sh "docker stop #{arg.cid}"
