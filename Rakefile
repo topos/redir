@@ -33,6 +33,11 @@ task :default do; sh "rake -T", verbose: false; end
 namespace :d do
   namespace :start do
     desc "start redir"
+    task :default, [:name,:opts,:debug] do |t,arg|
+      start(arg.name,'--publish-all' + " #{arg.opts}",!arg.debug.nil?)
+    end
+
+    desc "start redir"
     task :redir, [:opts,:debug] do |t,arg|
       start('redir','--publish-all' + " #{arg.opts}",!arg.debug.nil?)
     end
@@ -55,7 +60,13 @@ namespace :d do
     desc "start zookeeper"
     task :zookeeper, [:opts,:debug] do |t,arg|
       arg.with_defaults(opts: '')
-      start(task2name(t.name),"--publish 2181:2181 --publish 2888:2888 --publish 38888:3888 #{arg.opts}",!arg.debug.nil?)
+      start(task2name(t.name),"--publish 2181:2181 --publish 2888:2888 --publish 3888:3888 #{arg.opts}",!arg.debug.nil?)
+    end
+
+    desc "start mesos"
+    task :mesos, [:opts,:debug] do |t,arg|
+      arg.with_defaults(opts: '')
+      start(task2name(t.name),arg.opts,!arg.debug.nil?)
     end
 
     def start(name, opts ='', debug =false)
@@ -97,8 +108,13 @@ namespace :d do
     task('d:docker').invoke(task2name(t.name))
   end
 
-  desc "make a docker container for dhcpd"
+  desc "make a docker container for zookeeper"
   task :zookeeper do |t|
+    task('d:docker').invoke(task2name(t.name))
+  end
+
+  desc "make a docker container for mesos"
+  task :mesos do |t|
     task('d:docker').invoke(task2name(t.name))
   end
 
