@@ -63,8 +63,14 @@ namespace :d do
       start(task2name(t.name),"--publish 2181:2181 --publish 2888:2888 --publish 3888:3888 #{arg.opts}",!arg.debug.nil?)
     end
 
-    desc "start mesos"
+    desc "start a mesos master"
     task :mesos, [:opts,:debug] do |t,arg|
+      arg.with_defaults(opts: '')
+      start(task2name(t.name),arg.opts,!arg.debug.nil?)
+    end
+
+    desc "start a mesos slave"
+    task :mesos_slave, [:opts,:debug] do |t,arg|
       arg.with_defaults(opts: '')
       start(task2name(t.name),arg.opts,!arg.debug.nil?)
     end
@@ -115,6 +121,11 @@ namespace :d do
 
   desc "make a docker container for mesos"
   task :mesos do |t|
+    task('d:docker').invoke(task2name(t.name))
+  end
+
+  desc "make a docker container for mesos"
+  task :mesos-slave do |t|
     task('d:docker').invoke(task2name(t.name))
   end
 
