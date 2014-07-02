@@ -30,62 +30,62 @@ task :ab, [:clients,:requests,:url,:opts] => 'run:ab'
 
 task :default do; sh "rake -T", verbose: false; end
 
-namespace :d do
-  namespace :start do
-    desc "start redir"
-    task :default, [:name,:opts,:debug] do |t,arg|
-      start(arg.name,'--publish-all' + " #{arg.opts}",!arg.debug.nil?)
-    end
-
-    desc "start redir"
-    task :redir, [:opts,:debug] do |t,arg|
-      start('redir','--publish-all' + " #{arg.opts}",!arg.debug.nil?)
-    end
-
-    desc "start mighttpd (mighty)"
-    task :mighttpd, [:opts,:debug] do |t,arg|
-      start('mighttpd','--publish 80:8080' + " #{arg.opts}",!arg.debug.nil?)
-    end
-
-    desc "start marathon"
-    task :marathon, [:opts,:debug] do |t,arg|
-      start('marathon','--publish 8000:8080' + " #{arg.opts}",!arg.debug.nil?)
-    end
-
-    desc "start dhcpd"
-    task :dhcpd, [:opts,:debug] do |t,arg|
-      start('dhcpd',arg.opts,!arg.debug.nil?)
-    end
-
-    desc "start zookeeper"
-    task :zookeeper, [:opts,:debug] do |t,arg|
-      arg.with_defaults(opts: '')
-      start(task2name(t.name),"--publish 2181:2181 --publish 2888:2888 --publish 3888:3888 #{arg.opts}",!arg.debug.nil?)
-    end
-
-    desc "start a mesos master"
-    task :mesos, [:opts,:debug] do |t,arg|
-      arg.with_defaults(opts: '')
-      start(task2name(t.name),arg.opts,!arg.debug.nil?)
-    end
-
-    desc "start a mesos slave"
-    task :mesos_slave, [:opts,:debug] do |t,arg|
-      arg.with_defaults(opts: '')
-      start(task2name(t.name),arg.opts,!arg.debug.nil?)
-    end
-
-    def start(name, opts ='', debug =false)
-      opts = '' if opts.nil?
-      raise "missing docker-image name" if name.nil?
-      unless debug
-        sh "docker run --detach --tty #{opts} #{name}"
-      else
-        sh "docker run --interactive --tty --user=root --entrypoint=/bin/bash #{opts} #{name}"
-      end
-    end
+namespace :start do
+  desc "start redir"
+  task :default, [:name,:opts,:debug] do |t,arg|
+    start(arg.name,'--publish-all' + " #{arg.opts}",!arg.debug.nil?)
   end
 
+  desc "start redir"
+  task :redir, [:opts,:debug] do |t,arg|
+    start('redir','--publish-all' + " #{arg.opts}",!arg.debug.nil?)
+  end
+
+  desc "start mighttpd (mighty)"
+  task :mighttpd, [:opts,:debug] do |t,arg|
+    start('mighttpd','--publish 80:8080' + " #{arg.opts}",!arg.debug.nil?)
+  end
+
+  desc "start marathon"
+  task :marathon, [:opts,:debug] do |t,arg|
+    start('marathon','--publish 8000:8080' + " #{arg.opts}",!arg.debug.nil?)
+  end
+
+  desc "start dhcpd"
+  task :dhcpd, [:opts,:debug] do |t,arg|
+    start('dhcpd',arg.opts,!arg.debug.nil?)
+  end
+
+  desc "start zookeeper"
+  task :zookeeper, [:opts,:debug] do |t,arg|
+    arg.with_defaults(opts: '')
+    start(task2name(t.name),"--publish 2181:2181 --publish 2888:2888 --publish 3888:3888 #{arg.opts}",!arg.debug.nil?)
+  end
+
+  desc "start a mesos master"
+  task :mesos, [:opts,:debug] do |t,arg|
+    arg.with_defaults(opts: '')
+    start(task2name(t.name),arg.opts,!arg.debug.nil?)
+  end
+
+  desc "start a mesos slave"
+  task :mesosslave, [:opts,:debug] do |t,arg|
+    arg.with_defaults(opts: '')
+    start(task2name(t.name),arg.opts,!arg.debug.nil?)
+  end
+
+  def start(name, opts ='', debug =false)
+    opts = '' if opts.nil?
+    raise "missing docker-image name" if name.nil?
+    unless debug
+      sh "docker run --detach --tty #{opts} #{name}"
+    else
+      sh "docker run --interactive --tty --user=root --entrypoint=/bin/bash #{opts} #{name}"
+    end
+  end
+end
+
+namespace :d do
   # semantically similiar to its ./lib/redir/Dockerfile
   desc "make a docker container for redir"
   task :redir => [:clean,:c] do |t|
@@ -125,7 +125,7 @@ namespace :d do
   end
 
   desc "make a docker container for mesos"
-  task :mesos-slave do |t|
+  task :mesosslave do |t|
     task('d:docker').invoke(task2name(t.name))
   end
 
