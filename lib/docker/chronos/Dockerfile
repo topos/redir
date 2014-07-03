@@ -28,14 +28,10 @@ RUN curl -sSfL http://downloads.mesosphere.io/master/ubuntu/14.04/mesos-0.19.0_r
 RUN easy_install /mesos.egg
 RUN rm -f /mesos.egg
 
-RUN mkdir -p /usr/local
-RUN curl -sSfL http://downloads.mesosphere.io/chronos/chronos-2.1.0_mesos-0.14.0-rc4.tgz --output /usr/local/chronos.tgz
-RUN cd /usr/local && tar xzf chronos.tgz
+RUN curl -sSfL http://downloads.mesosphere.io/chronos/chronos-2.1.0_mesos-0.14.0-rc4.tgz --output /opt/chronos.tgz
+RUN cd /opt && tar xzf chronos.tgz
+RUN rm -f /opt/chronos.tgz
 
-ADD 
-
-RUN echo zk://172.17.42.1:2181/mesos > /etc/mesos/zk
-
-USER root
-EXPOSE 5050
-ENTRYPOINT ["/usr/local/chronos/bin/start-chronos.bash","--master zk://localhost:2181/mesos","--zk_hosts zk://localhost:2181/mesos","--http_port 8081"]
+USER daemon
+EXPOSE 8081
+ENTRYPOINT ["/opt/chronos/bin/start-chronos.bash","--master zk:172.17.42.1:2181/mesos","--zk_hosts zk://172.17.42.1:2181/mesos","--http_port 8081"]
