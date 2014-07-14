@@ -85,7 +85,7 @@ OS = case os
      when 'linux'; 'linux'
      else raise "unknown OS: #{os}"
      end
-GHC_VERSION = '7.8.2'
+GHC_VERSION = '7.8.3'
 GHC_PACKAGE_PATH = "#{PROJ_DIR}/.cabal-sandbox/x86_64-#{OS}-ghc-#{GHC_VERSION}-packages.conf.d"
 CABAL_SANDBOX_DIR = "#{PROJ_DIR}/.cabal-sandbox"
 #EXTRA_INC_DIR = "/opt/zmq/include"
