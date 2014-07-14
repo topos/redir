@@ -1,5 +1,5 @@
 namespace :ghc do
-  VER = '7.8.2'
+  VER = '7.8.3'
   GHC_URL = "http://www.haskell.org/ghc/dist/#{VER}/ghc-#{VER}-src.tar.bz2"
   GHC_TAR = "/var/tmp/#{GHC_URL.split('/').last}"
   GHC_DIR = "/var/tmp/#{GHC_URL.split('/').last.split('-src').first}"
