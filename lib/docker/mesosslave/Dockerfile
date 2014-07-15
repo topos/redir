@@ -30,5 +30,5 @@ RUN rm -f /mesos.egg
 RUN echo zk://172.17.42.1:2181/mesos > /etc/mesos/zk
 
 USER root
-EXPOSE 5050
+EXPOSE 5051
 ENTRYPOINT ["/usr/bin/mesos-init-wrapper","slave"]

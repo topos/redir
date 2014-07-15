@@ -71,7 +71,7 @@ namespace :start do
   desc "start a mesos slave"
   task :mesosslave, [:opts,:debug] do |t,arg|
     arg.with_defaults(opts: '')
-    start(task2name(t.name),'--publish-all ' + arg.opts,!arg.debug.nil?)
+    start(task2name(t.name),'--net=host ' + arg.opts,!arg.debug.nil?)
   end
 
   desc "start a mesos slave"
