@@ -1,5 +1,14 @@
 namespace :macvlan do
-  IFACE = ENV['HW_IFACE'] || 'eth0'
+  def ifaces
+    `ip link show up`.each_line{|l|l.strip}.split("\n").select{|l|!!(l=~/^[0-9]+:/)}.map{|l|l.split[1].chomp(':')}
+  end
+  def guess_phy_iface
+    # take first one
+    ifaces.select{|i|!(i=~/^(lo|docker[0-9]+|lxcbr[0-9])$/)}[0]
+  end
+
+  GIFACE = guess_phy_iface
+  IFACE = ENV['HW_IFACE'] || GIFACE
   MACVLAN = 'macvlan'
   VDEVICE = "#{MACVLAN}0"
   IP = `ip address show dev #{IFACE}|grep "inet "|awk '{print $2}'`.strip
@@ -22,10 +31,10 @@ namespace :macvlan do
   end
 
   task :info do
-    p "IFACE = #{IFACE}"
-    p "IP = #{IP}"
-    p "NETWORK = #{NETWORK}"
-    p "GATEWAY = #{GATEWAY}"  
+    puts "IFACE = #{IFACE}"
+    puts "IP = #{IP}"
+    puts "NETWORK = #{NETWORK}"
+    puts "GATEWAY = #{GATEWAY}"  
   end
 
   HOST = 'google.com'

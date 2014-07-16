@@ -13,7 +13,7 @@ namespace :docker do
   task :mk, [:docker_dir,:name] do |t,arg|
     raise "no docker_dir arg.".red if arg.docker_dir.nil?
     arg.with_defaults(name: arg.docker_dir)
-    Dir.chdir "#{PROJ_DIR}/lib/docker/#{arg.docker_dir}" do
+    Dir.chdir arg.docker_dir do
       sh "docker build --rm --tag=#{arg.name} ."
     end
   end
@@ -31,11 +31,11 @@ namespace :docker do
     puts "#{d}".green
 
     msg = <<EOF
-memory and swap accounting
+for memory and swap accounting, run the following:
   if you want to enable memory and swap accounting, you must add the following 
   command-line parameters to your kernel:
 
-  $ cgroup_enable=memory swapaccount=1https://github.com/sinatra/sinatra-contrib/issues/111
+  $ cgroup_enable=memory swapaccount=1
 
   Add the above parameters by editing /etc/default/grub and extending 
   GRUB_CMDLINE_LINUX. Look for the following line:
