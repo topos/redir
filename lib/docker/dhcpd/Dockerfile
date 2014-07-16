@@ -11,6 +11,6 @@ RUN sudo apt-get install isc-dhcp-server
 ADD dhcpd.conf /etc/dhcp/
 ADD pipework /usr/bin/pipework
 
-ENTRYPOINT ["pipework --wait -i eth1 && dhcpd -f eth1"]
 USER daemon
+ENTRYPOINT ["dhcpd -f"]
 

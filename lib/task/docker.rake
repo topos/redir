@@ -9,11 +9,11 @@ namespace :docker do
     end
   end
 
-  desc 'make container'
+  desc 'make container: docker_dir in lib/docker'
   task :mk, [:docker_dir,:name] do |t,arg|
     raise "no docker_dir arg.".red if arg.docker_dir.nil?
-    raise "no name arg.".red if arg.name.nil?
-    Dir.chdir arg.docker_dir do
+    arg.with_defaults(name: arg.docker_dir)
+    Dir.chdir "#{PROJ_DIR}/lib/docker/#{arg.docker_dir}" do
       sh "docker build --rm --tag=#{arg.name} ."
     end
   end

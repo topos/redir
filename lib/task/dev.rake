@@ -15,6 +15,7 @@ namespace :dev do
       sleep
     end
   end
+
   task :all do
     Dir.chdir(SRC_DIR) do
       make_spec
