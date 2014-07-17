@@ -80,6 +80,12 @@ namespace :start do
     start(task2name(t.name),'--publish-all ' + arg.opts,!arg.debug.nil?)
   end
 
+  desc "start a mesos slave"
+  task :ddt, [:opts,:debug] do |t,arg|
+    arg.with_defaults(opts: '')
+    start(task2name(t.name),'--publish-all ' + arg.opts,!arg.debug.nil?)
+  end
+
   def start(name, opts ='', debug =false)
     opts = '' if opts.nil?
     raise "missing docker-image name" if name.nil?
@@ -137,6 +143,11 @@ namespace :d do
 
   desc "make a docker container for chronos"
   task :chronos do |t|
+    task('d:docker').invoke(task2name(t.name))
+  end
+
+  desc "make a docker container for ddt"
+  task :ddt do |t|
     task('d:docker').invoke(task2name(t.name))
   end
 
