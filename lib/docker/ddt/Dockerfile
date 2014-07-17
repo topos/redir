@@ -2,8 +2,9 @@
 FROM ubuntu:14.04
 MAINTAINER topos (slacket@gmail.com)
 
-RUN apt-get -q update && apt-get upgrade -y
-RUN apt-get -qy install dnsmasq wget iptables
+RUN apt-get -q update
+RUN apt-get upgrade -y
+RUN apt-get -qy install dnsmasq wget
 
 ENV ARCH amd64
 ENV DIST trusty
@@ -24,6 +25,7 @@ RUN printf "DEFAULT linux\nKERNEL linux\nAPPEND initrd=initrd.gz\n" > pxelinux.c
 
 ADD ddt-start /usr/sbin/
 RUN chmod +x /usr/sbin/ddt-start
+RUN mkdir -p /var/lib/misc && chown daemon /var/lib/misc
 
-USER daemon
+USER root
 ENTRYPOINT ["/usr/sbin/ddt-start"]

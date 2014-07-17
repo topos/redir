@@ -30,7 +30,67 @@ task :ab, [:clients,:requests,:url,:opts] => 'run:ab'
 
 task :default do; sh "rake -T", verbose: false; end
 
-namespace :start do
+# semantically similiar to its ./lib/redir/Dockerfile
+desc "make a docker container for redir"
+task :redir => [:clean,:c] do |t|
+  name = task2name t.name
+  path = mk_docker_dir(name)
+  sh "cp #{SRC_DIR}/Main #{path}/redir"
+  sh "cp #{ETC_DIR}/redir.yml #{path}/redir.yml"
+  sh "cp #{LIB_DIR}/docker/redir/Dockerfile #{path}/"
+  task('docker:mk').invoke(path,name)
+end
+
+# semantically similiar to its ./lib/redir/Dockerfile
+desc "make a docker container for mighttpd"
+task :mighttpd do |t|
+  task('docker').invoke(task2name(t.name))
+end
+
+# semantically similiar to its ./lib/redir/Dockerfile
+desc "make a docker container for marathon"
+task :marathon do |t|
+  task('docker').invoke(task2name(t.name))
+end
+
+desc "make a docker container for dhcpd"
+task :dhcpd do |t|
+  task('docker').invoke(task2name(t.name))
+end
+
+desc "make a docker container for zookeeper"
+task :zookeeper do |t|
+  task('docker').invoke(task2name(t.name))
+end
+
+desc "make a docker container for mesos"
+task :mesos do |t|
+  task('docker').invoke(task2name(t.name))
+end
+
+desc "make a docker container for mesos"
+task :mesosslave do |t|
+  task('docker').invoke(task2name(t.name))
+end
+
+desc "make a docker container for chronos"
+task :chronos do |t|
+  task('docker').invoke(task2name(t.name))
+end
+
+desc "make a docker container for ddt"
+task :ddt do |t|
+  task('docker').invoke(task2name(t.name))
+end
+
+desc "make a docker image"
+task :docker, :name do |t,arg|
+  raise "mising docker-image name" if arg.name.nil?
+  path = mk_docker_dir(arg.name)
+  task('docker:mk').invoke(path,arg.name)
+end
+
+namespace :s do
   desc "start redir"
   task :default, [:name,:opts,:debug] do |t,arg|
     start(arg.name,'--publish-all' + " #{arg.opts}",!arg.debug.nil?)
@@ -94,68 +154,6 @@ namespace :start do
     else
       sh "docker run --interactive --tty --user=root --entrypoint=/bin/bash #{opts} #{name}"
     end
-  end
-end
-
-namespace :d do
-  # semantically similiar to its ./lib/redir/Dockerfile
-  desc "make a docker container for redir"
-  task :redir => [:clean,:c] do |t|
-    name = task2name t.name
-    path = mk_docker_dir(name)
-    sh "cp #{SRC_DIR}/Main #{path}/redir"
-    sh "cp #{ETC_DIR}/redir.yml #{path}/redir.yml"
-    sh "cp #{LIB_DIR}/docker/redir/Dockerfile #{path}/"
-    task('docker:mk').invoke(path,name)
-  end
-
-  # semantically similiar to its ./lib/redir/Dockerfile
-  desc "make a docker container for mighttpd"
-  task :mighttpd do |t|
-    task('d:docker').invoke(task2name(t.name))
-  end
-
-  # semantically similiar to its ./lib/redir/Dockerfile
-  desc "make a docker container for redir"
-  task :marathon do |t|
-    task('d:docker').invoke(task2name(t.name))
-  end
-
-  desc "make a docker container for dhcpd"
-  task :dhcpd do |t|
-    task('d:docker').invoke(task2name(t.name))
-  end
-
-  desc "make a docker container for zookeeper"
-  task :zookeeper do |t|
-    task('d:docker').invoke(task2name(t.name))
-  end
-
-  desc "make a docker container for mesos"
-  task :mesos do |t|
-    task('d:docker').invoke(task2name(t.name))
-  end
-
-  desc "make a docker container for mesos"
-  task :mesosslave do |t|
-    task('d:docker').invoke(task2name(t.name))
-  end
-
-  desc "make a docker container for chronos"
-  task :chronos do |t|
-    task('d:docker').invoke(task2name(t.name))
-  end
-
-  desc "make a docker container for ddt"
-  task :ddt do |t|
-    task('d:docker').invoke(task2name(t.name))
-  end
-
-  desc "make a docker image"
-  task :docker, :name do |t,arg|
-    raise "mising docker-image name" if arg.name.nil?
-    path = mk_docker_dir(arg.name)
-    task('docker:mk').invoke(path,arg.name)
   end
 
   def mk_docker_dir(name)
