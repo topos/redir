@@ -26,6 +26,8 @@ RUN printf "DEFAULT linux\nKERNEL linux\nAPPEND initrd=initrd.gz\n" > pxelinux.c
 ADD ddt-start /usr/sbin/
 RUN chmod +x /usr/sbin/ddt-start
 RUN mkdir -p /var/lib/misc && chown daemon /var/lib/misc
+# test tftp
+#RUN cp /usr/sbin/ddt-start /tftp/ 
 
 USER root
 ENTRYPOINT ["/usr/sbin/ddt-start"]
