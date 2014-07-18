@@ -13,7 +13,6 @@ WORKDIR /var/tmp/redir
 COPY redir.yml /etc/redir.yml
 COPY redir /sbin/redir
 
-ENTRYPOINT ["/sbin/redir"]
-
 USER daemon
 EXPOSE 8080
+ENTRYPOINT ["/sbin/redir"]

@@ -10,7 +10,7 @@ ENV ARCH amd64
 ENV DIST trusty
 ENV MIRROR http://archive.ubuntu.com
 
-WORkDIR /usr/bin
+WORkDIR /usr/local/bin
 RUN wget --no-check-certificate https://raw.github.com/jpetazzo/pipework/master/pipework
 RUN chmod +x pipework
 
@@ -23,9 +23,9 @@ RUN wget $MIRROR/ubuntu/dists/$DIST/main/installer-$ARCH/current/images/netboot/
 RUN mkdir pxelinux.cfg
 RUN printf "DEFAULT linux\nKERNEL linux\nAPPEND initrd=initrd.gz\n" > pxelinux.cfg/default
 
-ADD ddt-start /usr/sbin/
-RUN chmod +x /usr/sbin/ddt-start
+ADD start /usr/sbin/
+RUN chmod +x /usr/sbin/start
 RUN mkdir -p /var/lib/misc && chown daemon /var/lib/misc
 
 USER root
-ENTRYPOINT ["/usr/sbin/ddt-start"]
+ENTRYPOINT ["/usr/sbin/start"]

@@ -143,16 +143,34 @@ namespace :s do
   desc "start a mesos slave"
   task :ddt, [:opts,:debug] do |t,arg|
     arg.with_defaults(opts: '')
-    start(task2name(t.name),'--publish-all ' + arg.opts,!arg.debug.nil?)
+    #pipework(task2name(t.name),'--publish-all ' + arg.opts,!arg.debug.nil?)
+    name = task2name(t.name)
+    opts = '--publish-all' + arg.opts
+    debug = !arg.debug.nil?
+    unless debug
+      sh "sudo pipework docker0 $(docker run --volume /dev/log:/dev/log --detach --tty --user=root #{opts} #{name}) 192.168.17.10/24"
+    else
+      sh "docker run --volume /dev/log:/dev/log --interactive --tty --user=root --entrypoint=/bin/bash #{opts} #{name}"
+    end
+  end
+
+  task :test_ddt, [:opts,:debug] do |t,arg|
+    arg.with_defaults(opts: '')
+    #pipework(task2name(t.name),'--publish-all ' + arg.opts,!arg.debug.nil?)
+    name = 'redir'
+    opts = '--publish-all' + arg.opts
+    debug = !arg.debug.nil?
+    puts "docker run --volume /dev/log:/dev/log --interactive --tty --user=root --entrypoint=/bin/bash #{opts} #{name}"
+    puts "pipework docker0 <ID> 0/0"
   end
 
   def start(name, opts ='', debug =false)
     opts = '' if opts.nil?
     raise "missing docker-image name" if name.nil?
     unless debug
-      sh "docker run --detach --tty #{opts} #{name}"
+      sh "docker run --volume /dev/log:/dev/log --detach --tty #{opts} #{name}"
     else
-      sh "docker run --interactive --tty --user=root --entrypoint=/bin/bash #{opts} #{name}"
+      sh "docker run --volume /dev/log:/dev/log --interactive --tty --user=root --entrypoint=/bin/bash #{opts} #{name}"
     end
   end
 
