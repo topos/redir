@@ -4,14 +4,16 @@ MAINTAINER topos (slacket@gmail.com)
 
 RUN echo "deb http://archive.ubuntu.com/ubuntu trusty main universe" \
     >> /etc/apt/sources.list
-RUN apt-get update -y 
-RUN apt-get upgrade -y
-RUN apt-get install -y libgmp10
-RUN mkdir -p /sbin
+RUN apt update -y 
+RUN apt upgrade -y
+RUN apt install -y libgmp10
+RUN apt install -y udhcpc
+RUN apt install -y traceroute
 
 WORKDIR /var/tmp/redir
-COPY redir.yml /etc/redir.yml
-COPY redir /sbin/redir
+ADD redir.yml /etc/
+ADD redir /usr/local/sbin/
+RUN chmod +x /usr/local/sbin/redir
 
 USER daemon
 EXPOSE 8080

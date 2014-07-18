@@ -148,7 +148,7 @@ namespace :s do
     opts = '--publish-all' + arg.opts
     debug = !arg.debug.nil?
     unless debug
-      sh "sudo pipework docker0 $(docker run --volume /dev/log:/dev/log --detach --tty --user=root #{opts} #{name}) 192.168.17.10/24"
+      sh "sudo pipework br0 $(docker run --volume /dev/log:/dev/log --detach --tty --user=root #{opts} #{name}) 192.168.17.10/24@192.168.17.1"
     else
       sh "docker run --volume /dev/log:/dev/log --interactive --tty --user=root --entrypoint=/bin/bash #{opts} #{name}"
     end
@@ -160,8 +160,7 @@ namespace :s do
     name = 'redir'
     opts = '--publish-all' + arg.opts
     debug = !arg.debug.nil?
-    puts "docker run --volume /dev/log:/dev/log --interactive --tty --user=root --entrypoint=/bin/bash #{opts} #{name}"
-    puts "pipework docker0 <ID> 0/0"
+    #id = `docker run --volume /dev/log:/dev/log --interactive --tty --user=root --entrypoint=/bin/bash #{opts} #{name}`.strip
   end
 
   def start(name, opts ='', debug =false)

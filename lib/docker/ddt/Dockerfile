@@ -23,11 +23,10 @@ RUN wget $MIRROR/ubuntu/dists/$DIST/main/installer-$ARCH/current/images/netboot/
 RUN mkdir pxelinux.cfg
 RUN printf "DEFAULT linux\nKERNEL linux\nAPPEND initrd=initrd.gz\n" > pxelinux.cfg/default
 
-ADD start /usr/sbin/
-RUN chmod +x /usr/sbin/start
+ADD start /usr/local/sbin/
+RUN chmod +x /usr/local/sbin/
 RUN mkdir -p /var/lib/misc && chown daemon /var/lib/misc
 # test tftp
 #RUN cp /usr/sbin/ddt-start /tftp/ 
-
 USER root
-ENTRYPOINT ["/usr/sbin/start"]
+ENTRYPOINT ["/usr/local/sbin/start"]
