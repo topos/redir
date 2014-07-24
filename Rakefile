@@ -148,28 +148,43 @@ namespace :s do
     opts = '--publish-all' + arg.opts
     debug = !arg.debug.nil?
     unless debug
-      sh "sudo pipework br0 $(docker run --volume /dev/log:/dev/log --detach --tty --user=root #{opts} #{name}) 192.168.17.10/24@192.168.17.1"
+      # hack
+      sh "sudo pipework br0 $(docker run --volume=/dev/log:/dev/log --detach --tty --user=root --cidfile='/tmp/ddt.pid' #{opts} #{name}) 192.168.17.10/24@192.168.17.1"
+      puts "e.g.: sudo pipework br0 $DOCKER_CONTAINR_ID 192.168.17.10/24"
+      puts "e.g.: sudo ip addr add 192.168.17/24 dev br0"
     else
-      sh "docker run --volume /dev/log:/dev/log --interactive --tty --user=root --entrypoint=/bin/bash #{opts} #{name}"
+      docker_id = arg.debug # hack
+      #sh "sudo pipework br0 $(docker run --net=none --volume /dev/log:/dev/log --tty --user=root --cidfile='/tmp/ddt.pid' #{opts} #{name}) 192.168.17.10/24@192.168.17.1"
+      #sh "docker run --net=none --volume /dev/log:/dev/log --interactive --tty --user=root --entrypoint=/bin/bash #{opts} #{name}"
+      sh "sudo pipework br0 #{docker_id} 192.168.17.10/24@192.168.17.1"
     end
   end
 
-  task :test_ddt, [:opts,:debug] do |t,arg|
-    arg.with_defaults(opts: '')
-    #pipework(task2name(t.name),'--publish-all ' + arg.opts,!arg.debug.nil?)
-    name = 'redir'
-    opts = '--publish-all' + arg.opts
+  task :pipework do
+    docker_id = `cat /tmp/ddt.pid`.strip
+    puts docker_id.red
+    sh "sudo pipework br0 #{docker_id} 192.168.17.10/24@192.168.17.1"
+    #sh "rake s:ddt[,#{docker_id}]"
+  end
+
+  # @todo: refactor a lot of grossneess below
+  task "run ddt workflow: start debeug_ddt and then pipework"
+  task :debug_ddt, [:opts] do |t,arg|
+    arg.with_defaults(opts:'')
+    name = 'ddt'
+    opts = arg.opts'--publish-all' + arg.opts
     debug = !arg.debug.nil?
-    #id = `docker run --volume /dev/log:/dev/log --interactive --tty --user=root --entrypoint=/bin/bash #{opts} #{name}`.strip
+    sh "rm -f /tmp/ddt.pid"
+    sh "docker run --net=none --volume=/dev/log:/dev/log --tty --user=root --cidfile='/tmp/ddt.pid' --entrypoint=/bin/bash #{opts} #{name}"
   end
 
   def start(name, opts ='', debug =false)
     opts = '' if opts.nil?
     raise "missing docker-image name" if name.nil?
     unless debug
-      sh "docker run --volume /dev/log:/dev/log --detach --tty #{opts} #{name}"
+      sh "docker run --net=none --volume /dev/log:/dev/log --detach --tty #{opts} #{name}"
     else
-      sh "docker run --volume /dev/log:/dev/log --interactive --tty --user=root --entrypoint=/bin/bash #{opts} #{name}"
+      sh "docker run --net=none --volume /dev/log:/dev/log --interactive --tty --user=root --entrypoint=/bin/bash #{opts} #{name}"
     end
   end
 
