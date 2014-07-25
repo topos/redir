@@ -160,31 +160,14 @@ namespace :s do
     end
   end
 
-  task :pipework do
-    docker_id = `cat /tmp/ddt.pid`.strip
-    puts docker_id.red
-    sh "sudo pipework br0 #{docker_id} 192.168.17.10/24@192.168.17.1"
-    #sh "rake s:ddt[,#{docker_id}]"
-  end
-
-  # @todo: refactor a lot of grossneess below
-  task "run ddt workflow: start debeug_ddt and then pipework"
-  task :debug_ddt, [:opts] do |t,arg|
-    arg.with_defaults(opts:'')
-    name = 'ddt'
-    opts = arg.opts'--publish-all' + arg.opts
-    debug = !arg.debug.nil?
-    sh "rm -f /tmp/ddt.pid"
-    sh "docker run --net=none --volume=/dev/log:/dev/log --tty --user=root --cidfile='/tmp/ddt.pid' --entrypoint=/bin/bash #{opts} #{name}"
-  end
-
   def start(name, opts ='', debug =false)
     opts = '' if opts.nil?
     raise "missing docker-image name" if name.nil?
+    net_type = ''
     unless debug
-      sh "docker run --net=none --volume /dev/log:/dev/log --detach --tty #{opts} #{name}"
+      sh "docker run #{net_type} --volume=/dev/log:/dev/log --detach --tty #{opts} #{name}"
     else
-      sh "docker run --net=none --volume /dev/log:/dev/log --interactive --tty --user=root --entrypoint=/bin/bash #{opts} #{name}"
+      sh "docker run #{net_type} --volume=/dev/log:/dev/log --interactive --tty --user=root --entrypoint=/bin/bash #{opts} #{name}"
     end
   end
 
@@ -199,5 +182,26 @@ namespace :s do
   # @todo: change below to be less error prone
   def task2name(name)
     name.split(':').last.strip
+  end
+end
+
+namespace :debug do
+  task :pipework do
+    docker_id = `cat /tmp/ddt.pid`.strip
+    puts docker_id.red
+    sh "sudo pipework br0 #{docker_id} 192.168.17.10/24@192.168.17.1"
+    #sh "rake s:ddt[,#{docker_id}]"
+  end
+
+  # @todo: refactor a lot of grossneess below
+  task "run ddt workflow: start debeug_ddt and then pipework"
+  task :ddt, [:opts] do |t,arg|
+    arg.with_defaults(opts:'')
+    name = 'ddt'
+    opts = '--publish-all ' + arg.opts
+    debug = !arg.debug.nil?
+    sh "rm -f /tmp/ddt.pid"
+    net_type = ''
+    sh "docker run #{net_type} --volume=/dev/log:/dev/log --interactive --tty --user=root --cidfile='/tmp/ddt.pid' --entrypoint=/bin/bash #{opts} #{name}"
   end
 end
