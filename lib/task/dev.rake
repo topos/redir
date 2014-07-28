@@ -83,9 +83,15 @@ namespace :dev do
   end
 
   desc "install packages"
-  task :packages do
+  task :pkgs do
+    PS = [] << 'libdevil-dev'
+    PS << 'llvm-dev'
+    PS << 'openvswitch-switch'
+    PS << 'openvswitch-controller'
+    PS << 'qemu-kvm' 
+    PS << 'libvirt-bin'
     sh "sudo apt-get update -y"
-    sh "sudo apt-get install -y rabbitmq-server librabbitmq-dev libdevil-dev llvm-dev"
+    sh "sudo apt-get install -y #{PS.join(' ')}"
   end
 
   desc "reset (remove cabal-dev) dev. env."

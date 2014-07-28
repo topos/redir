@@ -6,10 +6,10 @@ pipework --wait
 
 dnsmasq --no-daemon \
   --interface=eth1 \
-  --listen-address 192.168.17.10 \
+  --listen-address 192.168.16.10 \
   --except-interface=lo,eth0 \
   --no-hosts --no-resolv \
-  --dhcp-authoritative --strict-order --dhcp-range=192.168.17.11,192.168.17.254 --dhcp-sequential-ip \
-  --dhcp-boot=pxelinux.0,pxeserver,192.168.17.10 \
+  --dhcp-authoritative --strict-order --dhcp-range=192.168.16.11,192.168.16.254 --dhcp-sequential-ip \
+  --dhcp-boot=pxelinux.0,pxeserver,192.168.16.10 \
   --pxe-service=x86PC,"Install Linux",pxelinux \
   --enable-tftp --tftp-root=/tftp/

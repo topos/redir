@@ -143,21 +143,7 @@ namespace :s do
   desc "start a mesos slave"
   task :ddt, [:opts,:debug] do |t,arg|
     arg.with_defaults(opts: '')
-    #pipework(task2name(t.name),'--publish-all ' + arg.opts,!arg.debug.nil?)
-    name = task2name(t.name)
-    opts = '--publish-all' + arg.opts
-    debug = !arg.debug.nil?
-    unless debug
-      # hack
-      sh "sudo pipework br0 $(docker run --volume=/dev/log:/dev/log --detach --tty --user=root --cidfile='/tmp/ddt.pid' #{opts} #{name}) 192.168.17.10/24@192.168.17.1"
-      puts "e.g.: sudo pipework br0 $DOCKER_CONTAINR_ID 192.168.17.10/24"
-      puts "e.g.: sudo ip addr add 192.168.17/24 dev br0"
-    else
-      docker_id = arg.debug # hack
-      #sh "sudo pipework br0 $(docker run --net=none --volume /dev/log:/dev/log --tty --user=root --cidfile='/tmp/ddt.pid' #{opts} #{name}) 192.168.17.10/24@192.168.17.1"
-      #sh "docker run --net=none --volume /dev/log:/dev/log --interactive --tty --user=root --entrypoint=/bin/bash #{opts} #{name}"
-      sh "sudo pipework br0 #{docker_id} 192.168.17.10/24@192.168.17.1"
-    end
+    start(task2name(t.name),'--publish-all ' + arg.opts,!arg.debug.nil?)
   end
 
   def start(name, opts ='', debug =false)
@@ -201,7 +187,7 @@ namespace :debug do
     opts = '--publish-all ' + arg.opts
     debug = !arg.debug.nil?
     sh "rm -f /tmp/ddt.pid"
-    net_type = ''
+    net_type = '--net=none' # --net=[bridge,none,container:name|id,host]
     sh "docker run #{net_type} --volume=/dev/log:/dev/log --interactive --tty --user=root --cidfile='/tmp/ddt.pid' --entrypoint=/bin/bash #{opts} #{name}"
   end
 end
