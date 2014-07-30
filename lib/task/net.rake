@@ -14,8 +14,8 @@ namespace :net do
     sh "sudo ovs-ofctl add-flow #{dev_name} udp,tp_src=67,tp_dst=68,action=drop"
   end
 
-  desc "unmake a network:open-vswitch bridge =dev0"
-  task :unmk, [:name] do |t,arg|
+  desc "rm a network:open-vswitch bridge =dev0"
+  task :rm, [:name] do |t,arg|
     dev_name = arg.name.nil? ? DEV_NAME : arg.name
     sh "sudo ovs-vsctl del-br #{dev_name}"
   end
