@@ -143,7 +143,7 @@ namespace :s do
   desc "start a mesos slave"
   task :ddt, [:opts,:debug] do |t,arg|
     arg.with_defaults(opts: '')
-    start(task2name(t.name),'--publish-all ' + arg.opts,!arg.debug.nil?)
+    start(task2name(t.name),'--publish-all' + arg.opts,!arg.debug.nil?)
   end
 
   def start(name, opts ='', debug =false)
@@ -151,9 +151,9 @@ namespace :s do
     raise "missing docker-image name" if name.nil?
     net_type = ''
     unless debug
-      sh "docker run #{net_type} --volume=/dev/log:/dev/log --detach --tty #{opts} #{name}"
+      sh "docker run #{net_type} --privileged --volume=/dev/log:/dev/log --detach --tty #{opts} #{name}"
     else
-      sh "docker run #{net_type} --volume=/dev/log:/dev/log --interactive --tty --user=root --entrypoint=/bin/bash #{opts} #{name}"
+      sh "docker run #{net_type} --privileged --volume=/dev/log:/dev/log --interactive --tty --user=root --entrypoint=/bin/bash #{opts} #{name}"
     end
   end
 
