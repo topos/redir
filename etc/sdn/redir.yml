@@ -1,0 +1,12 @@
+defaults: &defaults
+  network: 
+    name: dev0
+    cidr: 192.168.16.1/24
+
+# a node key must match a docker-image name
+# @todo: add name to node definition
+sdn:
+  <<: *defaults
+  docker_nodes:
+    - {image: ddt, cidr: 192.168.16.10/24}
+    - {image: redir, cidr: dhcp, instances: 3}
