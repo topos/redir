@@ -1,4 +1,20 @@
 namespace :docker do
+  task :start, [:name,:debug,:opts] do |t,arg|
+    raise ":name of image is nil" if arg.name.nil?
+    cmd = []
+    cmd << 'docker run'
+    cmd << arg.opts
+    if arg.debug.nil? || arg.debug == ''
+      cmd << '--detach'
+    else
+      cmd << '--interactive'
+      cmd << '--user=root'
+      cmd << '--entrypoint=/bin/bash'
+    end
+    cmd << arg.name
+    sh cmd.join ' '
+  end
+
   desc 'run bash within a container'
   task :sh, [:cmd,:image] do |t,arg|
     arg.with_defaults(image:'ubuntu')
@@ -32,6 +48,22 @@ namespace :docker do
     puts "#{v}".cyan
     d = `which docker`.strip
     puts "#{d}".green
+    task :start, [:name,:opts,:debug] do |t,arg|
+      raise ":name of image is nil" if arg.name.nil?
+      cmd = []
+      cmd << 'docker run'
+      cmd << arg.opts
+      if arg.debug.nil?
+        cmd << '--detach'
+      else
+        cmd << '--interactive'
+        cmd << '--user=root'
+        cmd << '--entrypoint=/bin/bash'
+      end
+      cmd << arg.name
+      sh cmd.join ' '
+    end
+
 
     msg = <<EOF
 for memory and swap accounting, run the following:
@@ -74,27 +106,11 @@ EOF
   task :stop, [:cid] do |t,arg|
     if arg.cid == 'all' || arg.cid.nil?
       sh "docker stop $(docker ps --all --quiet)"
-      else
+    else
       sh "docker stop #{arg.cid}"
     end
   end
   
-  task :start, [:name,:opts,:debug] do |t,arg|
-    raise ":name of image is nil" if arg.name.nil?
-    cmd = []
-    cmd << 'docker run'
-    cmd << arg.opts
-    if arg.debug.nil?
-      cmd << '--detach'
-    else
-      cmd << '--interactive'
-      cmd << '--user=root'
-      cmd << '--entrypoint=/bin/bash'
-    end
-    cmd << arg.name
-    sh cmd.join ' '
-  end
-
   desc "clean (remove) stopped containers"
   task :clean, [:cid,:opt] do |t,arg|
     arg.with_defaults(opt:'')

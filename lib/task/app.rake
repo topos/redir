@@ -7,69 +7,69 @@ namespace :app do
     opts << '--volume=/dev/log:/dev/log' 
     opts << '--tty'
     opts.uniq!
-    sh "rake docker:start[#{arg.name},'#{opts.uniq.join ' '}',#{arg.debug}]"
+    sh "rake docker:start[#{arg.name},#{arg.debug},'#{(opts.uniq.join ' ').strip}']"
   end
 
   # @todo: refactor--get rid of boilerplate
   namespace :start do
     desc "start redir"
-    task :redir, [:opts,:debug] do |t,arg|
+    task :redir, [:debug,:opts] do |t,arg|
       arg.with_defaults(opts:'',debug:'')
-      sh "rake app:start[#{task2name(t.name)},'--publish-all #{arg.opts},#{arg.debug}]"
+      sh "rake app:start[#{task2name(t.name)},#{arg.debug},'--publish-all #{arg.opts}']"
     end
 
     desc "start mighttpd (mighty)"
-    task :mighttpd, [:opts,:debug] do |t,arg|
+    task :mighttpd, [:debug,:opts] do |t,arg|
       arg.with_defaults(opts:'',debug:'')
-      sh "rake app:start[#{task2name(t.name)},'--publish-all #{arg.opts},#{arg.debug}]"
+      sh "rake app:start[#{task2name(t.name)},#{arg.debug},'--publish-all #{arg.opts}']"
     end
 
     desc "start marathon"
-    task :marathon, [:opts,:debug] do |t,arg|
+    task :marathon, [:debug,:opts] do |t,arg|
       arg.with_defaults(opts:'',debug:'')
-      sh "rake app:start[#{task2name(t.name)},'--publish-all #{arg.opts},#{arg.debug}]"
+      sh "rake app:start[#{task2name(t.name)},#{arg.debug},'--publish-all #{arg.opts}']"
     end
 
     desc "start dhcpd"
-    task :dhcpd, [:opts,:debug] do |t,arg|
+    task :dhcpd, [:debug,:opts] do |t,arg|
       arg.with_defaults(opts:'',debug:'')
-      sh "rake app:start[#{task2name(t.name)},'--publish-all #{arg.opts},#{arg.debug}]"
+      sh "rake app:start[#{task2name(t.name)},#{arg.debug},'--publish-all #{arg.opts}']"
     end
 
     desc "start zookeeper"
-    task :zookeeper, [:opts,:debug] do |t,arg|
+    task :zookeeper, [:debug, :opts] do |t,arg|
       arg.with_defaults(opts:'',debug:'')
-      sh "rake app:start[#{task2name(t.name)},'--publish-all #{arg.opts},#{arg.debug}]"
+      sh "rake app:start[#{task2name(t.name)},#{arg.debug},'--publish-all #{arg.opts}']"
     end
 
     desc "start a mesos master"
-    task :mesos, [:opts,:debug] do |t,arg|
+    task :mesos, [:debug,:opts] do |t,arg|
       arg.with_defaults(opts:'',debug:'')
-      sh "rake app:start[#{task2name(t.name)},'--publish-all #{arg.opts},#{arg.debug}]"
+      sh "rake app:start[#{task2name(t.name)},#{arg.debug},'--publish-all #{arg.opts}']"
     end
 
     desc "start a mesos slave"
-    task :mesosslave, [:opts,:debug] do |t,arg|
+    task :mesosslave, [:debug,:opts] do |t,arg|
       arg.with_defaults(opts:'',debug:'')
-      sh "rake app:start[#{task2name(t.name)},'--publish-all #{arg.opts},#{arg.debug}]"
+      sh "rake app:start[#{task2name(t.name)},#{arg.debug},'--publish-all #{arg.opts}']"
     end
 
     desc "start a mesos slave"
-    task :chronos, [:opts,:debug] do |t,arg|
-      arg.with_defaults(opts:'',debug:'')
-      sh "rake app:start[#{task2name(t.name)},'--publish-all #{arg.opts},#{arg.debug}]"
+    task :chronos, [:debug,:opts] do |t,arg|
+      arg.with_defaults(:debug,opts:'')
+      sh "rake app:start[#{task2name(t.name)},#{arg.debug},'--publish-all #{arg.opts}']"
     end
 
     desc "start a mesos slave"
-    task :ddt, [:opts,:debug] do |t,arg|
+    task :ddt, [:debug,:opts] do |t,arg|
       arg.with_defaults(opts:'',debug:'')
-      sh "rake app:start[#{task2name(t.name)},'--publish-all #{arg.opts},#{arg.debug}]"
+      sh "rake app:start[#{task2name(t.name)},#{arg.debug},'--publish-all #{arg.opts}']"
     end
 
     desc "start a mesos slave"
-    task :consul, [:opts,:debug] do |t,arg|
+    task :consul, [:debug,:opts] do |t,arg|
       arg.with_defaults(opts:'',debug:'')
-      sh "rake app:start[#{task2name(t.name)},'--publish-all #{arg.opts},#{arg.debug}]"
+      sh "rake app:start[#{task2name(t.name)},#{arg.debug},'--publish-all #{arg.opts}']"
     end
 
     def mk_docker_dir(name)
