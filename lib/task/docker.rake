@@ -26,10 +26,10 @@ namespace :docker do
   end
 
   desc 'make container: docker_dir in lib/docker'
-  task :mk, [:docker_dir,:name] do |t,arg|
-    raise "no docker_dir arg.".red if arg.docker_dir.nil?
-    arg.with_defaults(name: arg.docker_dir)
-    Dir.chdir arg.docker_dir do
+  task :mk, [:name] do |t,arg|
+    raise "no docker_dir arg.".red if arg.name.nil?
+    docker_dir = "#{PROJ_DIR}/lib/docker/#{arg.name}"
+    Dir.chdir docker_dir do
       sh "docker build --rm --tag=#{arg.name} ."
     end
   end
@@ -41,6 +41,7 @@ namespace :docker do
       puts '  ' + l.yellow
     end
   end
+  task :images => :dirs
 
   desc 'info'
   task :info do

@@ -34,10 +34,13 @@ namespace :net do
   desc "start a docker/lxc container, assign ip | dhcp, join dev net"
   task :add, [:docker_img,:cidr_dhcp,:opts,:debug,:name] do |t,arg|
     raise "docker_img can't be nil" if arg.docker_img.nil?
-    arg.with_defaults(opts:'',cidr_dhcp:'dhcp',name:DEVNET_NAME)
+    arg.with_defaults(cidr_dhcp:'dhcp',opts:'',name:DEVNET_NAME)
     begin
       cid = start(arg.docker_img,arg.opts,!arg.debug.nil?)
-      puts cid.green
+      pid = `docker inspect --format "{{.State.Pid}}" #{cid}`.strip
+      procn = `ps -eaf | grep #{pid}`.strip
+      puts "container ID: #{cid}".green
+      #puts "container PID: #{pid} (#{procn})" # @todo: needs a stronger regex match
       task('net:join').invoke(cid,arg.cidr_dhcp,arg.debug,arg.name) if arg.debug.nil?
     rescue
       puts $!
@@ -51,8 +54,8 @@ namespace :net do
     sh "sudo #{PROJ_DIR}/bin/pipework #{arg.name} #{arg.container} #{arg.cidr_dhcp}"
   end
 
-  desc "add a docker/lxc container to your dev net by name or id"
-  task :del, [:container,:name] do |t,arg|
+  desc "rm (remove) a docker/lxc container to your dev net by name or id"
+  task :rm, [:container,:name] do |t,arg|
     raise "container cannot be nil" unless arg.container.nil?
     arg.with_defaults(name:DEVNET_NAME) 
     sh "echo sudo ovs-vsctl del-port #{arg.name} <container to interface>"
@@ -63,11 +66,18 @@ namespace :net do
     require 'uuid'
     cidfile = "/var/tmp/#{UUID.new.generate}.cid"
     begin
+      cmd = [] 
+      cmd += %w(docker run)
+      cmd << "--cidfile=#{cidfile}"
+      cmd += %w(--privileged --volume=/dev/log:/dev/log --tty) 
       unless debug
-        sh "docker run #{opts} --cidfile=#{cidfile} --privileged --volume=/dev/log:/dev/log --detach --tty #{name}"
+        cmd += %w(--detach)
       else
-        sh "docker run #{opts} --cidfile=#{cidfile} --privileged --volume=/dev/log:/dev/log --interactive --tty --user=root --entrypoint=/bin/bash #{name}"
+        cmd += %w(--interactive  --user=root --entrypoint=/bin/bash)
       end
+      cmd += opts.split
+      cmd << name
+      sh cmd.join ' '
       `cat #{cidfile}`.strip
     ensure
       sh "echo sudo rm -f #{cidfile}"

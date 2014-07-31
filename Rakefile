@@ -5,7 +5,7 @@ ENV['HOME'] = PROJ_DIR # hack to keep .cabal under this project dir.
 Dir.glob("#{PROJ_HOME}/lib/task/*.rake"){|p| import p}
 
 desc "start src development".green
-task :cc => :start_src_dev
+task :cc => 'dev:start'
 
 desc "compile/link code".green
 task :c => 'dev:all'
@@ -13,8 +13,7 @@ task :c => 'dev:all'
 desc "test code".green
 task :t => :test
 
-task :start_src_dev => ['dev:start']
-task :stop => ['db:stop','es:stop']
+task :start => 'dev:start'
 task :spec => 'dev:spec'
 task :test => 'dev:test'
 task :clean => 'dev:clean'

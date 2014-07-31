@@ -28,6 +28,7 @@ def process_running?(name, argfilter =nil)
   require 'sys/proctable'
   include Sys
   ProcTable.ps do |proc|
+    # @todo: gross--refactor
     if argfilter.nil?
       return true if proc.comm == name
     else
@@ -70,13 +71,16 @@ def version(bin, arg ='--version')
 end
 
 PROJ_DIR = File.expand_path("#{File.dirname(__FILE__)}/../../.")
-SRC_DIR = proj_dir('src')
-ETC_DIR = proj_dir('etc')
-LIB_DIR = proj_dir('lib')
-DIST_DIR = proj_dir('dist')
-TASK_DIR = proj_dir('lib/task')
-SANDBOX_DIR = proj_dir('.cabal-sandbox')
+SRC_DIR = proj_dir 'src'
+ETC_DIR = proj_dir 'etc'
+LIB_DIR = proj_dir 'lib'
+DIST_DIR = proj_dir 'dist'
+TASK_DIR = proj_dir 'lib/task'
+DOCKER_DIR = proj_dir 'lib/docker'
+SANDBOX_DIR = proj_dir '.cabal-sandbox'
+
 PROJ_HOME = PROJ_DIR
+PROJ_NAME = PROJ_DIR.split('/').last
 OPT_DIR = '/opt'
 
 os = `uname -s`.strip.downcase

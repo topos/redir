@@ -37,19 +37,14 @@ namespace :dev do
   end
 
   desc "install app"
-  task :install, [:dev] do |t,arg|
-    Dir.chdir DIST_DIR do
-      sh 'sudo cp -a redir /var/tmp'
-    end
-    Dir.chdir '/var/tmp/redir' do
-      sh 'sudo chown root:root .'
-      sh 'sudo chmod -R 0555 .'
-    end
+  task :install, [:dir,:name] do |t,arg|
+    arg.with_defaults dir:'/var/tmp/redir', name:'redir'
+    sh "cp -a #{SRC_DIR}/Main #{arg.dir}/#{arg.name}"
   end
 
   desc "clean"
   task :clean, [:dev] do |t,arg|
-    Dir.chdir(SRC_DIR) do
+    Dir.chdir SRC_DIR do
       fs = FileList.new(['*Spec','*.o','*.hi','*.hc'].map{|g|"./**/#{g}"})
       sh "rm -f Main #{fs.join(' ')}"
     end
