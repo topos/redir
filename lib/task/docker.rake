@@ -18,7 +18,7 @@ namespace :docker do
     end
   end
 
-  desc 'list of docker files'
+  desc 'docker files'
   task :files do
     sh "ls #{LIB_DIR}/docker".green
   end
@@ -61,45 +61,51 @@ EOF
   desc 'install docker'
   task :install => 'docker:install:pkg'
 
-  # container
-  namespace :container do
-    desc "list containers"
-    task :list do
-      sh "docker ps --all"
-    end
+  desc "list containers"
+  task :list do
+    sh "docker ps --all"
+  end
+  task :ls => :list
 
-    desc "stop all or an individual container"
-    task :stop, [:cid] do |t,arg|
-      if arg.cid == 'all' || arg.cid.nil?
-        sh "docker stop $(docker ps --all --quiet)"
+  desc "stop all or an individual container"
+  task :stop, [:cid] do |t,arg|
+    if arg.cid == 'all' || arg.cid.nil?
+      sh "docker stop $(docker ps --all --quiet)"
       else
-        sh "docker stop #{arg.cid}"
-      end
-    end
-
-    desc "stop all or a list of container IDs"
-    task :start, [:ids] do |t,arg|
-      raise "container ID' is required" if arg.ids.nil?
-      arg.ids.split.each do |id|
-        sh "docker start #{id}"
-      end
-    end
-
-    desc "clean (remove) stopped containers"
-    task :clean, [:cid,:opt] do |t,arg|
-      arg.with_defaults(opt:'')
-      begin
-        if arg.cid.nil?
-          sh "docker rm #{arg.opt} $(docker ps --quiet --all)"
-        else
-          sh "docker rm #{arg.opt} #{arg.cid}"
-        end
-      rescue
-        puts $!
-      end
+      sh "docker stop #{arg.cid}"
     end
   end
   
+  task :start, [:name,:opts,:debug] do |t,arg|
+    raise ":name of image is nil" if arg.name.nil?
+    cmd = []
+    cmd << 'docker run'
+    cmd << arg.opts
+    if arg.debug.nil?
+      cmd << '--detach'
+    else
+      cmd << '--interactive'
+      cmd << '--user=root'
+      cmd << '--entrypoint=/bin/bash'
+    end
+    cmd << arg.name
+    sh cmd.join ' '
+  end
+
+  desc "clean (remove) stopped containers"
+  task :clean, [:cid,:opt] do |t,arg|
+    arg.with_defaults(opt:'')
+    begin
+      if arg.cid.nil?
+        sh "docker rm #{arg.opt} $(docker ps --quiet --all)"
+      else
+        sh "docker rm #{arg.opt} #{arg.cid}"
+      end
+    rescue
+      puts $!
+    end
+  end
+
   # container
   namespace :image do
     desc "list images"
