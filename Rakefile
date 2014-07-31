@@ -83,6 +83,11 @@ task :ddt do |t|
   task('docker').invoke(task2name(t.name))
 end
 
+desc "make a docker container for cosul"
+task :consul do |t|
+  task('docker').invoke(task2name(t.name))
+end
+
 desc "make a docker image"
 task :docker, :name do |t,arg|
   raise "mising docker-image name" if arg.name.nil?
@@ -142,6 +147,12 @@ namespace :s do
 
   desc "start a mesos slave"
   task :ddt, [:opts,:debug] do |t,arg|
+    arg.with_defaults(opts: '')
+    start(task2name(t.name),'--publish-all' + arg.opts,!arg.debug.nil?)
+  end
+
+  desc "start a mesos slave"
+  task :consul, [:opts,:debug] do |t,arg|
     arg.with_defaults(opts: '')
     start(task2name(t.name),'--publish-all' + arg.opts,!arg.debug.nil?)
   end
