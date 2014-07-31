@@ -29,7 +29,7 @@ namespace :net do
   task :ls => :list
 
   desc "start a docker/lxc container, assign ip | dhcp, join dev net"
-  task :add, [:docker_img,:opts,:cidr_dhcp,:debug,:name] do |t,arg|
+  task :add, [:docker_img,:cidr_dhcp,:opts,:debug,:name] do |t,arg|
     raise "docker_img can't be nil" if arg.docker_img.nil?
     arg.with_defaults(opts:'',cidr_dhcp:'dhcp',name:DEV_NAME)
     begin
@@ -45,7 +45,7 @@ namespace :net do
   task :join, [:container,:cidr_dhcp,:name] do |t,arg|
     raise "container (id or name) can't be nil" if arg.container.nil?
     arg.with_defaults(cidr_dhcp:'dhcp',name:DEV_NAME)
-    sh "sudo pipework #{arg.name} #{arg.container} #{arg.cidr_dhcp}"
+    sh "sudo #{PROJ_DIR}/bin/pipework #{arg.name} #{arg.container} #{arg.cidr_dhcp}"
   end
 
   desc "add a docker/lxc container to your dev net by name or id"
