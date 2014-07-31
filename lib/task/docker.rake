@@ -18,9 +18,12 @@ namespace :docker do
     end
   end
 
-  desc 'docker files'
-  task :files do
-    sh "ls #{LIB_DIR}/docker".green
+  desc 'docker dirs'
+  task :dirs do
+    puts "#{LIB_DIR}/docker".green
+    `ls -1 #{LIB_DIR}/docker`.split.each do |l|
+      puts '  ' + l.yellow
+    end
   end
 
   desc 'info'

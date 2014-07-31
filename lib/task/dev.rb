@@ -107,5 +107,6 @@ _path << '/usr/local/bin'
 _path << '/usr/bin'
 _path << '/bin'
 
+ENV['SHELL'] = '/bin/bash'
 ENV['PATH'] = _path.join(':')
 ENV['JAVA_HOME'] = '/usr/lib/jvm/java-8-oracle'
