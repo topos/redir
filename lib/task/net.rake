@@ -26,6 +26,14 @@ namespace :net do
   end
   task :unmake => :unmk
 
+  desc "remove all devices from ovs switch"
+  task :clean, [:name] do |t,arg|
+    arg.with_defaults(name: 'dev0')
+    `sudo ovs-vsctl list-ports #{arg.name}`.split.each do |port|
+      sh "sudo ovs-vsctl del-port #{port}"
+    end
+  end
+
   desc "list interfaces in dev net"
   task :ls, [:name] do |t,arg|
     arg.with_defaults(name:DEVNET_NAME)

@@ -15,6 +15,13 @@ namespace :docker do
     sh cmd.join ' '
   end
 
+  desc "shell access to a running container"
+  task :enter, [:cid] do |t,arg|
+    raise "cid arg cannot be ni" if arg.cid.nil?
+    pid = `(docker inspect --format '{{ .State.Pid }}' #{arg.cid}`.strip
+    puts "nsenter --target #{pid} --mount --uts --ipc --net --pid"
+  end
+
   desc 'run bash within a container'
   task :sh, [:cmd,:image] do |t,arg|
     arg.with_defaults(image:'ubuntu')
@@ -177,6 +184,8 @@ EOF
     desc "apt-get install lxc-docker"
     task :install do
       sh "sudo apt-get install -y lxc-docker"
+      sh "docker run --rm -v /usr/local/bin:/target jpetazzo/nsenter"
+      sh "sudo cp /tmp/nsenter /usr/local/bin"
     end
 
     desc "apt-get update"

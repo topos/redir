@@ -1,7 +1,8 @@
 namespace :sdn do
   require 'yaml'
   SDN_DIR = "#{PROJ_DIR}/etc/sdn"
-  
+
+  desc 'create and start a dev sdn: dev0'
   task :start, [:yaml] do |t,arg|
     raise "yaml is nil" if arg.yaml.nil?
     y = YAML.load_file "#{SDN_DIR}/#{arg.yaml}"
