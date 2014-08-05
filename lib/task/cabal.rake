@@ -47,6 +47,13 @@ namespace :cabal do
     end
   end
 
+  desc "cabal update"
+  task :update do
+    Dir.chdir PROJ_DIR do 
+      sh "cabal update"
+    end
+  end
+
   desc "update each cabal in lib/cabal.list"
   task :update_list do
     Dir.chdir(LIB_DIR) do
