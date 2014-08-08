@@ -1,19 +1,17 @@
-{-# LANGUAGE DeriveGeneric #-}
-{-# LANGUAGE OverloadedStrings #-}
-module Data.Yaml.Etc.Config (redirects,url,src,dst,statusCode,yaml) where
+{-# LANGUAGE DeriveGeneric, OverloadedStrings #-}
+module Data.Yaml.Etc.Config (redirs,src,dst,statusCode,yaml) where
 
 import GHC.Generics
 import Control.Exception
 import Control.Applicative ((<$>))
+import Data.ByteString (ByteString)
 import Data.Yaml (FromJSON,decodeFileEither)
 
-data Redirects = Redirects {redirects :: [Redirect]
-                           ,url :: Redirect
+data Redirects = Redirects {redirs :: [Redirect]
                            } deriving (Generic,Eq,Show)
 instance FromJSON Redirects
 
 type Url = String
-
 data Redirect = Redirect {statusCode :: Int
                          ,src :: Url
                          ,dst :: Url
