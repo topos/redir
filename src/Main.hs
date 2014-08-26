@@ -10,20 +10,20 @@ import Pipes ((>->),yield)
 import Pipes.Wai (Application,Flush(..),producerRequestBody,responseProducer)
 import qualified Pipes.Prelude as P
 import qualified Data.Map as M
-import Data.Yaml.Etc.Config (Redirects,redirs,src,dst,statusCode,yaml)
+import Data.Yaml.Etc.Config (Redirect(..),redirs,yaml)
 
 main :: IO ()
 main = do 
-  rs <- yaml "/etc/redir.yml"
-  run 8080 $ app rs
+  rsy <- yaml "/etc/redir.yml"
+  run 8080 $ app $ redirs rsy
 
-app :: Redirects -> Application
-app redirects req res = do
-  let m = M.fromList $ map (\r->(src r,(dst r, statusCode r))) $ redirs redirects
+app :: [Redirect] -> Application
+app rs req res = do
+  let rmap = M.fromList $ map (\r->(src r,(dst r, statusCode r))) rs
       ps = pathInfo req
       k = if ps == [] then "url" else unpack $ head ps
       key = "http://" ++ k
-      (url, status) = case M.lookup (key) m of
+      (url, status) = case M.lookup (key) rmap of
                         Just pair -> pair
                         Nothing -> ("-[default]-", 0)
   res $ responseProducer status200 [("Content-Type","text/plain"),("Location",pack url)] $ yield Flush

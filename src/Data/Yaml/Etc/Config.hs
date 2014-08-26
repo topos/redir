@@ -1,5 +1,5 @@
 {-# LANGUAGE DeriveGeneric, OverloadedStrings #-}
-module Data.Yaml.Etc.Config (Redirects,redirs,yaml,src,dst,statusCode) where
+module Data.Yaml.Etc.Config (Redirects(..),Redirect(..),yaml) where
 
 import GHC.Generics
 import Control.Exception
