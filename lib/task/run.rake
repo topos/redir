@@ -34,7 +34,7 @@ namespace :run do
 
   desc "run apache bench against Main"
   task :ab, [:clients,:requests,:url, :opts] do |t,arg| 
-    arg.with_defaults(clients: 100, requests: 100000, url: 'http://localhost:8080/')
+    arg.with_defaults(clients: 100, requests: 1000000, url: 'http://localhost:8080/')
     sh "ab -c #{arg.clients} -n #{arg.requests} #{arg.opts} #{arg.url}"
   end
 end

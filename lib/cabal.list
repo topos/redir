@@ -15,3 +15,4 @@ yaml-0.8.8.4
 pipes-wai-3.0.2
 http-reverse-proxy-0.4.0.1
 splice-0.6.1.1
+monad-memo-0.4.1

@@ -1,5 +1,5 @@
 {-# LANGUAGE DeriveGeneric, OverloadedStrings #-}
-module Data.Yaml.Etc.Config (redirs,src,dst,statusCode,yaml) where
+module Data.Yaml.Etc.Config (Redirects,redirs,yaml,src,dst,statusCode) where
 
 import GHC.Generics
 import Control.Exception
@@ -19,6 +19,5 @@ data Redirect = Redirect {statusCode :: Int
 instance FromJSON Redirect
 
 type Filename = String
-
 yaml :: Filename -> IO Redirects
 yaml file = either throw id <$> decodeFileEither file
