@@ -8,6 +8,7 @@ Spec
 .cabal*
 .ghc
 .python-*
+.#*.hs
 opt
 cabal.sandbox.config
 cloud-haskell

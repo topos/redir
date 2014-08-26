@@ -26,4 +26,4 @@ app redirects req res = do
       (url, status) = case M.lookup (key) m of
                         Just pair -> pair
                         Nothing -> ("-[default]-", 0)
-  res $ responseProducer status200 [("Content-Type", "text/plain"),("Location", pack url)] $ yield Flush
+  res $ responseProducer status200 [("Content-Type","text/plain"),("Location",pack url)] $ yield Flush
