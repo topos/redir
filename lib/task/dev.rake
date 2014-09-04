@@ -200,7 +200,7 @@ namespace :dev do
   def putsh(ok, res, app_name)
     if ok
       r = []
-      r << "+ make".green + " ./src/#{app_name} " + "succeeded".green + " @#{DateTime.now.strftime('%H:%M:%S')}\n"
+      r << "+ make".green + " ./src/#{app_name} " + "succeeded".green + " #{DateTime.now.strftime('%H:%M:%S')}\n"
     else
       r = res.map{|l|l.yellow}
       r << "- make".red + " ./src/#{app_name} " + "failed".red + " @#{DateTime.now.strftime('%H:%M:%S')}\n"

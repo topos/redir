@@ -1,4 +1,4 @@
-{-# LANGUAGE Rank2Types,OverloadedStrings,ScopedTypeVariables #-}
+{-# LANGUAGE Rank2Types, OverloadedStrings, ScopedTypeVariables #-}
 module Main where
 
 import Blaze.ByteString.Builder (fromByteString)
