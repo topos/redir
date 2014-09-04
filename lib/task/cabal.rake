@@ -59,16 +59,16 @@ namespace :cabal do
     Dir.chdir(LIB_DIR) do
       list = File.open('cabal.list').read
       list.gsub!(/\s*\r\n?/, "\n")
-      list.each_line do |l|
+      list.each_line.sort_by{|w|w.downcase}.each do |l|
         unless l =~ /^\s*#/
           cab_elems = l.split('|').first.split('-')
           version, cabal = cab_elems.pop.strip, cab_elems.map{|e|e.strip}.join('-')
           l = cabal_list(cabal)
           if l.last.first == cabal
             if l[-1].last == version
-              puts "current: " + "#{l.last.first}-#{l.last.last}".green
+              printf "%23s %-23s\n", "#{l.last.first}-#{l.last.last}", 'current'
             else
-              puts "#{l.last.first}-#{l.last.last} | #{cabal}-#{version} (local version)".yellow
+              printf "%23s %-23s\n".yellow, "#{cabal}-#{version}", "#{l.last.first}-#{l.last.last}"
             end
           end
         end
