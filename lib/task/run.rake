@@ -21,9 +21,9 @@ namespace :run do
   end
 
   desc "curl"
-  task :curl, [:url] do |t,arg| 
-    arg.with_defaults(url: 'http://localhost:8080/')
-    sh "curl -D - -o - #{arg.url}"
+  task :curl, [:url,:req] do |t,arg| 
+    arg.with_defaults(url: 'http://localhost:8080/', req:'get')
+    sh "curl --#{arg.req} -o - #{arg.url}"
   end
 
   desc "http get"
