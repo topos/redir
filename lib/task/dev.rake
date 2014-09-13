@@ -169,7 +169,7 @@ namespace :dev do
   end
 
   def make(src =src_files, name ='Main')
-    ghc_cmd = "#{GHC} --make #{src} -o #{name} #{EXTRA_LIB} -optl-Wl,-rpath,'#{EXTRA_LIB_DIR}' 2>&1"
+    ghc_cmd = "#{GHC} -Wall --make #{src} -o #{name} #{EXTRA_LIB} -optl-Wl,-rpath,'#{EXTRA_LIB_DIR}' 2>&1"
     #puts ghc_cmd.red
     IO.popen(ghc_cmd) do |io|
       Process.wait(io.pid)

@@ -1,23 +1,43 @@
 {-# LANGUAGE DeriveGeneric, OverloadedStrings #-}
-module Data.Yaml.Etc.Config (Redirects(..),Redirect(..),yaml) where
+module Data.Yaml.Etc.Config (Redirects (..), Redirect (..), yaml, redirect) where
 
 import GHC.Generics
 import Control.Exception
 import Control.Applicative ((<$>))
 import Data.ByteString (ByteString)
-import Data.Yaml (FromJSON,decodeFileEither)
+import Data.Yaml (FromJSON, decodeFileEither)
+import Network.Wai (Application, pathInfo)
+import qualified Data.Map as Map
+
+redirect :: String -> Redirects -> IO Redirect
+-- redirect "foo" (yaml "/etc/redir.yaml")
+redirect key rs = do
+  let rmap = Map.fromList $ map (\r->(srcUrl r,r)) (redirs rs)
+      key' = "http://" ++ key
+  return $ case Map.lookup (key') rmap of 
+             Just r -> r
+             Nothing -> Redirect 0 "" ""
+
+yaml :: String -> IO Redirects
+yaml filename = either throw id <$> decodeFileEither filename
 
 data Redirects = Redirects {redirs :: [Redirect]
                            } deriving (Generic,Eq,Show)
 instance FromJSON Redirects
 
 type Url = String
-data Redirect = Redirect {statusCode :: Int
-                         ,src :: Url
-                         ,dst :: Url
+
+data Redirect = Redirect { statusCode :: Int 
+                         , srcUrl :: Url
+                         , dstUrl :: Url
                          } deriving (Generic,Eq,Show)
 instance FromJSON Redirect
 
-type Filename = String
-yaml :: Filename -> IO Redirects
-yaml file = either throw id <$> decodeFileEither file
+
+  -- let rmap = Map.fromList $ map (\r->(src r,(dst r, statusCode r))) rs
+  --     ps = pathInfo req
+  --     k = if ps == [] then "url" else Text.unpack $ head ps
+  --     key = "http://" ++ k
+  --     (url, status) = case Map.lookup (key) rmap of 
+  --                       Just pair -> pair
+  --                       Nothing -> ("http://google.com", 0)
