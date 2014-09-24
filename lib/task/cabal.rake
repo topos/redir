@@ -109,11 +109,13 @@ namespace :cabal do
     sh "cabal sandbox add-source #{arg.src}"
   end
 
+  VERSION = {:cabal => '1.20.0.2', :cabal_install => '1.20.0.3'}
+
   task :compile_cabal do
     Dir.chdir('/var/tmp') do
-      sh "wget http://www.haskell.org/cabal/release/cabal-1.18.1.2/Cabal-1.18.1.2.tar.gz"
-      sh "tar xpf Cabal-1.18.1.2.tar.gz"
-      Dir.chdir('Cabal-1.18.1.2') do
+      sh "wget http://www.haskell.org/cabal/release/cabal-#{VERSION[:cabal]}/Cabal-#{VERSION[:cabal]}.tar.gz"
+      sh "tar xpf Cabal-VERSION[:cabal].tar.gz"
+      Dir.chdir('Cabal-VERSION[:cabal]') do
         sh "ghc --make Setup"
         sh "./Setup configure --global --prefix=/opt/ghc"
         sh "./Setup build"
@@ -123,9 +125,8 @@ namespace :cabal do
   end
 
   namespace :cabal_install do
-    task :install_from_src do
-      VERSION = '1.18.0.3'
-      CABAL_INST = "cabal-install-#{VERSION}"
+    task :from_src do
+      CABAL_INST = "cabal-install-#{VERSION[:cabal_install]}"
       Dir.chdir('/var/tmp') do
         sh "wget http://www.haskell.org/cabal/release/#{CABAL_INST}/#{CABAL_INST}.tar.gz"
         sh "tar xpf #{CABAL_INST}.tar.gz"
