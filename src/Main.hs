@@ -14,11 +14,13 @@ import qualified Data.ByteString.Char8 as Char8
 import qualified Data.Text as Text
 import qualified Pipes.ByteString as PipeBS
 import qualified Pipes.Prelude as Pipe
-import Data.Yaml.Etc.Config (Redirects (..), yaml, dstUrl, redirect)
+import Data.Etc.Yaml (Redirects (..), yaml, dstUrl, redirect)
 
-main :: IO ()
-main = do 
-  redirs <- yaml "/etc/redir.yml"
+main = start "/etc/redir.yml"
+
+start :: String -> IO ()
+start filename = do 
+  redirs <- yaml filename
   run 8080 $ app redirs
 
 app :: Redirects -> Application
