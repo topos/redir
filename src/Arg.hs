@@ -1,8 +1,15 @@
 {-# LANGUAGE TemplateHaskell #-}
-module Arg (args,ip,port,redirectFile,help,usage,printUsage,Options(..)) where
+module Arg (args
+           ,ip
+           ,port
+           ,redirectFile
+           ,help
+           ,usage
+           ,printUsage
+           ,Options(..)) where
 
 import System.Console.GetOpt
-import System.Environment (getArgs,getProgName)
+import System.Environment (getArgs, getProgName)
 import Control.Lens
 
 data Options = Options{_ip :: String
