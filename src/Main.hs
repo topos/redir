@@ -1,54 +1,18 @@
 {-# LANGUAGE Rank2Types, OverloadedStrings, ScopedTypeVariables #-}
 module Main where
 
-import Data.ByteString.Lazy (ByteString)
-import Blaze.ByteString.Builder (fromByteString)
-import Network.HTTP.Types (status200)
-import Network.HTTP.Client (Response, newManager, httpLbs)
-import Network.Wai (Application, pathInfo)
-import Network.Wai.Handler.Warp (run, defaultSettings)
-import Pipes.Wai (Request, Application, Flush (..), responseProducer)
-import Pipes (Producer, (>->), yield, lift)
-import Pipes.HTTP (parseUrl, defaultManagerSettings, responseBody)
-import qualified Data.ByteString.Char8 as Char8
-import qualified Data.Text as Text
-import qualified Pipes.ByteString as PipeBS
-import qualified Pipes.Prelude as Pipe
-import Data.Etc.Yaml (Redirects (..), yaml, dstUrl, redirect)
+import ProxyApp (start)
 
-main = start "/etc/redir.yml"
+import Util.Header
+import System.Plugins
 
-start :: String -> IO ()
-start filename = do 
-  redirs <- yaml filename
-  run 8080 $ app redirs
+main :: IO ()
+main = do
+    mv <- load "Plug.o" ["."] [] "helloPlugin"
+    case mv of
+        LoadFailure msg -> print msg
+        LoadSuccess _ v -> print $ show (v :: PT Int)
 
-app :: Redirects -> Application
-app rs req res = do
-  r <- redirect (req2key req) rs
-  let url = dstUrl r
-      status = status200
-      headers = [("Content-Type", "text/plain"), ("Location", Char8.pack url)]
-      content = do
-        get url >-> Pipe.map (Chunk . fromByteString)
-        yield Flush 
-  res $ responseProducer status headers content
+main' :: IO ()
+main' = start "/etc/redir.yaml"
 
-get :: String -> Producer PipeBS.ByteString IO ()
-get url = do
-  req <- lift $ parseUrl url
-  mgr <- lift $ newManager defaultManagerSettings
-  res <- lift $ httpLbs req mgr
-  PipeBS.fromLazy $ responseBody res
-
-req2key :: Request -> String
-req2key req = if keys == [] 
-              then "_default" 
-              else Text.unpack (head keys) 
-                  where keys = pathInfo req
-
--- example/test code
-get' :: String -> Producer PipeBS.ByteString IO ()
-get' url = do
-  req <- lift $ parseUrl url
-  yield $ "yabba dabba doo"
